@@ -6,15 +6,13 @@ public class GameSystemsInstaller : MonoInstaller
 {
     public GameObject PlayerUIPrefab;
     public GameObject AudioManagerPrefab;
-    public GameObject LevelManagerPrefab;
-    public AudioMixer audioMixer;
 
     public override void InstallBindings()
     {
         //Debug.Log("Creating GameSystem Bindings");
         //Container.Bind<IGameInstance>().To<GameInstance>().AsSingle();
-        //Container.Bind<IPlayerUI>().To<PlayerUI>().FromComponentsInNewPrefab(PlayerUIPrefab).AsSingle();
-        //Container.Bind<IAudioManager>().To<AudioManager>().FromComponentsInNewPrefab(AudioManagerPrefab).AsSingle();
+        Container.Bind<IPlayerUI>().To<PlayerUI>().FromComponentsInNewPrefab(PlayerUIPrefab).AsSingle();
+        Container.Bind<IAudioManager>().To<AudioManager>().FromComponentsInNewPrefab(AudioManagerPrefab).AsSingle();
         //Container.Bind<ILevelManager>().To<LevelManager>().FromComponentInNewPrefab(LevelManagerPrefab).AsSingle();
     }
 }

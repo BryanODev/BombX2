@@ -2,18 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using Gameplay.GameplayUtilities;
 
 public class Bomb : Actor
 {
-    public int bombID;
+    [Header("Bomb Sprite")]
+    [SerializeField] Transform bombExplosionSprite;
+    [SerializeField] Transform bombSprite;
 
-    Transform bombSprite;
+    [Header("Bomb Gameplay Settings")]
+    public bool autoStartTimer = true;
+    public int bombID;
+    public bool bombDefused;
 
     [SerializeField] float bombTimer = 8;
     float currentBombTimer;
     Coroutine bombTimerCoroutine;
 
     [Inject] IGameModeState gameModeState;
+    [Inject] IGameModeScore gameModeScore;
 
     [Header("Bomb Animation")]
 
@@ -24,15 +31,17 @@ public class Bomb : Actor
     [SerializeField] float bombDenotateScaleStart = 1.0f;
 
     SpriteRenderer spriteRenderer;
-
     bool isAlive = true;
+
+    [Inject]
+    IAudioManager audioManager;
+    public AudioClip bombExplosionSFX;
 
     public override void Awake()
     {
         base.Awake();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        bombSprite = transform.GetChild(0);
 
         currentBombTimer = bombTimer;
     }
@@ -40,13 +49,18 @@ public class Bomb : Actor
     public override void OnEnable()
     {
         base.OnEnable();
-        StartBombTimer();
+
+        if (autoStartTimer)
+        {
+            StartBombTimer();
+        }
     }
 
     public void StartBombTimer() 
     {
         if (bombTimerCoroutine == null)
         {
+            bombDefused = false;
             bombTimerCoroutine = StartCoroutine(BombTimer());
         }
     }
@@ -77,7 +91,15 @@ public class Bomb : Actor
 
     public void DefuseBomb() 
     {
+        if (bombDefused) { return; }
+
+        
         ResetBomb();
+        bombDefused = true;
+
+        //We add a score!
+        gameModeScore.AddScore(1);
+
         spriteRenderer.color = defusedColor;
     }
 
@@ -86,6 +108,11 @@ public class Bomb : Actor
         Debug.Log("Boom!");
 
         if (!isAlive) { return; }
+
+        rb.velocity = Vector3.zero;
+
+        audioManager?.PlayOneShotSound(bombExplosionSFX);
+        StartCoroutine(GameplayUtilities.DoCameraShake(0.2f, .2f, 0));
 
         if (bombTimerCoroutine != null) 
         {
@@ -99,35 +126,64 @@ public class Bomb : Actor
             gameModeState?.EndGame();
         }
 
-        //End the game!
-        ReleaseToPool();
+        //We disable the bomb sprite, and enable the bomb explosion sprite
+        bombSprite.gameObject.SetActive(false);
+        bombExplosionSprite.gameObject.SetActive(true);
+
+        //StartCoroutine(ReleaseToPoolAfterSeconds(1f));
     }
 
     void ResetBomb() 
     {
         //Reset bomb timer
-        currentBombTimer = bombTimer;
+        ResetTimer();
 
         //Stop couroutines
-        if (bombTimerCoroutine != null)
-        {
-            StopCoroutine(bombTimerCoroutine);
-        }
-
-        bombTimerCoroutine = null;
+        StopBombTimerCoroutine();
 
         //Reset color to white/default
-        spriteRenderer.color = Color.white;
+        SetSpriteRendererColor(Color.white);
 
         //Reset Scaling of object and sprite
-        SetStartingScale();
-        bombSprite.localScale = Vector3.one;
+        ResetTransformScale();
 
-        isAlive = true;
+        SetIsAlive(true);
+
+        ResetBombSprite();
     }
 
     public override void OnDisable()
     {
         ResetBomb();
+    }
+
+    void ResetTimer() { currentBombTimer = bombTimer; }
+
+    public void StopBombTimerCoroutine()
+    {
+        if (bombTimerCoroutine != null)
+        {
+            StopCoroutine(bombTimerCoroutine);
+            bombTimerCoroutine = null;
+        }
+    }
+
+    public void SetSpriteRendererColor(Color newColor) { spriteRenderer.color = newColor; }
+
+    public override void ResetTransformScale()
+    {
+        base.ResetTransformScale();
+        bombSprite.localScale = Vector3.one; ;
+    }
+
+    public void SetIsAlive(bool newIsAlive) 
+    {
+        isAlive = newIsAlive;
+    }
+
+    public void ResetBombSprite() 
+    {
+        bombSprite.gameObject.SetActive(true);
+        bombExplosionSprite.gameObject.SetActive(false);
     }
 }

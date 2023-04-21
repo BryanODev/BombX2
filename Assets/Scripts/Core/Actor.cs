@@ -17,8 +17,8 @@ public class Actor : MonoBehaviour, ISelectable
     Coroutine bounceCouroutine;
     bool bouncing = false;
 
-    Rigidbody2D rb;
-    Collider2D actorCollider;
+    protected Rigidbody2D rb;
+    protected Collider2D actorCollider;
     Vector3 startScale;
     int currentBounces = 0;
 
@@ -142,6 +142,15 @@ public class Actor : MonoBehaviour, ISelectable
         actorPool = pool;
     }
 
+    public IEnumerator ReleaseToPoolAfterSeconds(float seconds) 
+    {
+        yield return new WaitForSeconds(seconds);
+
+        ReleaseToPool();
+
+        yield return null;
+    }
+
     public void ReleaseToPool() 
     {
         if (actorPool != null)
@@ -165,7 +174,7 @@ public class Actor : MonoBehaviour, ISelectable
         isOnGround = false;
     }
 
-    public void SetStartingScale() 
+    public virtual void ResetTransformScale() 
     {
         transform.localScale = startScale;
     }

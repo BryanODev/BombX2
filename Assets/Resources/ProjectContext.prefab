@@ -74,10 +74,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f16021d43ffe1a0458ebcca85e7daed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerUIPrefab: {fileID: 3486919028349457951, guid: 68fd0f2229bf0974897b401b192fafa0,
-    type: 3}
-  AudioManagerPrefab: {fileID: 8649523195590491242, guid: efad5b742bda8a84b8967b323e1fb4e8,
-    type: 3}
-  LevelManagerPrefab: {fileID: 8171265519600436596, guid: 84dcfe0ab6ab61a4db29e4bfe0559c49,
-    type: 3}
-  audioMixer: {fileID: 24100000, guid: f2eb3525d34f00845a08f070f7fc81e5, type: 2}
+  PlayerUIPrefab: {fileID: 826783163475369460, guid: b1f7e3295b4a7934eb1a3761a21018ad, type: 3}
+  AudioManagerPrefab: {fileID: 8165569275335704931, guid: 1baf5822badcae14a8986c7668bcc6d6, type: 3}

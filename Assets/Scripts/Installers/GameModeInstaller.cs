@@ -16,5 +16,6 @@ public class GameModeInstaller : MonoInstaller<GameModeInstaller>
         // Bind the IGameModeState and IGameModeEvents interfaces
         Container.Bind<IGameModeState>().To<GameMode>().FromResolve();
         Container.Bind<IGameModeEvents>().To<GameMode>().FromResolve();
+        Container.Bind<IGameModeScore>().To<GameMode>().FromResolve();
     }
 }

@@ -5,6 +5,7 @@ using Zenject;
 
 public delegate void OnGameStart();
 public delegate void OnGameEnd();
+public delegate void OnGameScoreChange(int score);
 
 public enum GameState
 {
@@ -13,6 +14,13 @@ public enum GameState
     StartingGame,
     InProcess,
     EndGame
+}
+
+public interface IGameModeScore 
+{
+    public OnGameScoreChange OnGameScoreChangeDelegate { get; set; }
+    public int GameScore { get; }
+    public void AddScore(int scoreToAdd);
 }
 
 public interface IGameModeState
@@ -28,10 +36,11 @@ public interface IGameModeEvents
 {
     public OnGameStart OnGameStartDelegate { get; set; }
     public OnGameEnd onGameEndDelegate { get; set; }
+    public OnGameScoreChange OnGameScoreChangeDelegate { get; set; }
 }
 
 //This class will be the base of the gameplay loop. Will be incharge of stuff like spawning the player, starting the game, ending and more.
-public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
+public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameModeScore
 {
     //public static GameMode Instance { get; private set; }
     public GameState currentState;
@@ -39,6 +48,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
     bool gameStarted;
     bool gameEnded;
 
+    int gameScore;
+    public int GameScore { get { return gameScore; } }
 
     public bool GameStarted { get { return gameStarted; } }
 
@@ -56,9 +67,11 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
     //Delegates
     public OnGameStart onGameStart;
     public OnGameEnd onGameEnd;
+    public OnGameScoreChange onGameScoreChange;
 
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
+    public OnGameScoreChange OnGameScoreChangeDelegate { get { return onGameScoreChange; } set { onGameScoreChange += value; } }
 
 
     Coroutine gameStartTimer;
@@ -179,6 +192,17 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
         currentState = GameState.InProcess;
 
         gameEnded = false;
+    }
+
+    public void AddScore(int scoreToAdd) 
+    {
+        gameScore += scoreToAdd;
+
+        if (onGameScoreChange != null) 
+        {
+            onGameScoreChange(gameScore);
+        }
+
     }
 
 }

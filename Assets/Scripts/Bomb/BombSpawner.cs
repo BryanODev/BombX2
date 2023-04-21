@@ -48,7 +48,7 @@ public class BombSpawner : MonoBehaviour
         
         if (bomb) 
         {
-            bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2.5f), Quaternion.identity);
+            bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2f), Quaternion.identity);
         }
 
         yield return new WaitForSeconds(2);
@@ -74,8 +74,8 @@ public class BombSpawner : MonoBehaviour
 
     Vector2 RandomPositionInArea(float xHalfExt, float yHalfExt) 
     {
-        float x = Random.Range(-xHalfExt, xHalfExt);
-        float y = Random.Range(-yHalfExt, yHalfExt);
+        float x = Random.Range(-xHalfExt, xHalfExt) / 2;
+        float y = Random.Range(-yHalfExt, yHalfExt) / 2;
 
         Vector2 pos = new Vector2(x, y);
 
@@ -88,10 +88,41 @@ public class BombSpawner : MonoBehaviour
 
         StopAllCoroutines();
 
-        for (int i = 0; i < bombs.Count; i++) 
+        StartCoroutine(ExplodeCurrentActiveBombs(.2f));
+    }
+
+    IEnumerator ExplodeCurrentActiveBombs(float delayPerExplosion) 
+    {
+        for (int i = 0; i < bombs.Count; i++)
         {
-            bombs[i].Explode();
+            bombs[i].StopBombTimerCoroutine();
+            yield return null;
         }
+
+        if (delayPerExplosion <= 0)
+        {
+            for (int i = 0; i < bombs.Count; i++)
+            {
+                bombs[i].Explode();
+                yield return null;
+            }
+        }
+        else 
+        {
+            for (int i = 0; i < bombs.Count; i++)
+            {
+                yield return new WaitForSeconds(delayPerExplosion);
+
+                if (!bombs[i].bombDefused && bombs[i].gameObject.activeSelf)
+                {
+                    bombs[i].Explode();
+                }
+
+                yield return null;
+            }
+        }
+
+        yield return null;
     }
 
     private Bomb CreateBomb()
@@ -128,8 +159,18 @@ public class BombSpawner : MonoBehaviour
         {
             for (int i = 0; i < 10; i++)
             {
-                bombPool?.Get();
+                Bomb bomb = bombPool?.Get() as Bomb;
+
+                if (bomb)
+                {
+                    bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2.5f), Quaternion.identity);
+                }
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position, new Vector3(3, 3, 1));
     }
 }
