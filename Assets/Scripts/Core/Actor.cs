@@ -14,7 +14,9 @@ public interface ISelectable
 
 public class Actor : MonoBehaviour, ISelectable
 {
-    Coroutine pickUpCoroutine;
+    Coroutine bounceCouroutine;
+    bool bouncing = false;
+
     Rigidbody2D rb;
     Collider2D actorCollider;
     Vector3 startScale;
@@ -23,7 +25,7 @@ public class Actor : MonoBehaviour, ISelectable
     [Header("Actor Properties")]
 
     public bool canBeSelected = true;
-    [HideInInspector] public bool isOnGround = true;
+    public bool isOnGround = true;
     [SerializeField] int maxBounces;
     public float bounceSpeeds;
 
@@ -50,11 +52,7 @@ public class Actor : MonoBehaviour, ISelectable
     {
         if (!canBeSelected) { return; }
 
-        if (pickUpCoroutine != null)
-        {
-            StopCoroutine(pickUpCoroutine);
-        }
-
+        StopBounceActor();
         PickUpActor();
     }
 
@@ -67,23 +65,27 @@ public class Actor : MonoBehaviour, ISelectable
     public virtual void OnDiselect()
     {
         DropActor();
-
-        if (!canBeSelected)
-        {
-            canBeSelected = true;
-        }
+        canBeSelected = true;
     }
 
     public virtual void DropActor() 
     {
-        if (pickUpCoroutine == null)
+        bounceCouroutine = StartCoroutine(BounceActor());
+    }
+
+    public void StopBounceActor() 
+    {
+        if (bounceCouroutine != null)
         {
-            StartCoroutine(BounceActor());
+            StopCoroutine(bounceCouroutine);
         }
+
+        bouncing = false;
     }
 
     public virtual IEnumerator BounceActor()
     {
+        bouncing = true;
         float timeElapsed = 0;
 
         currentBounces = 0;
@@ -92,9 +94,9 @@ public class Actor : MonoBehaviour, ISelectable
         Vector3 fromScale = startScale * bounceHeight;
         Vector3 toScale = startScale;
 
-        while (currentBounces != maxBounces + 1)
+        while (currentBounces != maxBounces + 1 && bouncing)
         {
-            while (transform.localScale != toScale)
+            while (transform.localScale != toScale && bouncing)
             {
                 transform.localScale = Vector3.Lerp(fromScale, toScale, timeElapsed);
                 timeElapsed += Time.deltaTime * bounceSpeeds;

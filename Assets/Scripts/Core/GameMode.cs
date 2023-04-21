@@ -19,6 +19,9 @@ public interface IGameModeState
 {
     void StartGame();
     void EndGame();
+
+    bool GameStarted { get; }
+    bool GameEnded { get; }
 }
 
 public interface IGameModeEvents 
@@ -34,6 +37,12 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
     public GameState currentState;
 
     bool gameStarted;
+    bool gameEnded;
+
+
+    public bool GameStarted { get { return gameStarted; } }
+
+    public bool GameEnded { get { return gameEnded; } }
 
     [Inject]
     DiContainer container;
@@ -50,6 +59,7 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
 
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
+
 
     Coroutine gameStartTimer;
 
@@ -143,6 +153,9 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
 
     public virtual void EndGame()
     {
+        //If the game already ended, no need of ending it again
+        if (gameEnded) { return; }
+
         Debug.Log("Game Ended!");
 
         currentState = GameState.EndGame;
@@ -151,6 +164,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
         {
             onGameEnd();
         }
+
+        gameEnded = true;
     }
 
     public bool HasGameStarted()
@@ -162,6 +177,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents
     {
         //Revive Player and continue
         currentState = GameState.InProcess;
+
+        gameEnded = false;
     }
 
 }

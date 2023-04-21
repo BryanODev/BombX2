@@ -10,7 +10,7 @@ public class Bomb : Actor
     Transform bombSprite;
 
     [SerializeField] float bombTimer = 8;
-    float currentBombTimer = 8;
+    float currentBombTimer;
     Coroutine bombTimerCoroutine;
 
     [Inject] IGameModeState gameModeState;
@@ -25,6 +25,7 @@ public class Bomb : Actor
 
     SpriteRenderer spriteRenderer;
 
+    bool isAlive = true;
 
     public override void Awake()
     {
@@ -32,11 +33,8 @@ public class Bomb : Actor
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         bombSprite = transform.GetChild(0);
-    }
 
-    public override void Start()
-    {
-        base.Start();
+        currentBombTimer = bombTimer;
     }
 
     public override void OnEnable()
@@ -56,6 +54,7 @@ public class Bomb : Actor
     public IEnumerator BombTimer() 
     {
         float timeElapsed = 0;
+
         while(currentBombTimer > 0) 
         {
             currentBombTimer -= Time.deltaTime;
@@ -78,34 +77,57 @@ public class Bomb : Actor
 
     public void DefuseBomb() 
     {
-        StopCoroutine(bombTimerCoroutine);
+        ResetBomb();
         spriteRenderer.color = defusedColor;
-
-        //Make sure the scale is the starting one when difused
-        SetStartingScale();
-        bombSprite.localScale = Vector3.one;
     }
 
     public void Explode() 
     {
         Debug.Log("Boom!");
 
-        gameModeState?.EndGame();
+        if (!isAlive) { return; }
+
+        if (bombTimerCoroutine != null) 
+        {
+            StopCoroutine(bombTimerCoroutine);
+        }
+
+        isAlive = false;
+
+        if (gameModeState.GameStarted && !gameModeState.GameEnded)
+        {
+            gameModeState?.EndGame();
+        }
 
         //End the game!
         ReleaseToPool();
     }
 
-    public override void OnDisable()
+    void ResetBomb() 
     {
+        //Reset bomb timer
         currentBombTimer = bombTimer;
-        StopCoroutine(BombTimer());
-        StopAllCoroutines();
+
+        //Stop couroutines
+        if (bombTimerCoroutine != null)
+        {
+            StopCoroutine(bombTimerCoroutine);
+        }
+
         bombTimerCoroutine = null;
 
+        //Reset color to white/default
         spriteRenderer.color = Color.white;
 
+        //Reset Scaling of object and sprite
         SetStartingScale();
         bombSprite.localScale = Vector3.one;
+
+        isAlive = true;
+    }
+
+    public override void OnDisable()
+    {
+        ResetBomb();
     }
 }

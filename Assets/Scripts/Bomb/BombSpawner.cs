@@ -9,11 +9,17 @@ public class BombSpawner : MonoBehaviour
     [SerializeField] private Bomb bombPrefab;
 
     private ObjectPool<Actor> bombPool;
+    public List<Bomb> bombs = new List<Bomb>();
 
     [Inject]
     DiContainer container;
     
     [Inject] IGameModeEvents gameModeEvents;
+
+    [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
+    private BombSpawnPattern lastPatternUsed;
+
+    int bombSpawningTimeMultiplier = 1;
 
     private void Awake()
     {
@@ -32,12 +38,60 @@ public class BombSpawner : MonoBehaviour
     public void StartSpawner() 
     {
         Debug.Log("Start Spawning Bombs!");
-        bombPool?.Get();
+
+        StartCoroutine(SpawnBombInArea());
+    }
+
+    IEnumerator SpawnBombInArea()
+    {
+        Bomb bomb = bombPool?.Get() as Bomb;
+        
+        if (bomb) 
+        {
+            bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2.5f), Quaternion.identity);
+        }
+
+        yield return new WaitForSeconds(2);
+
+        StartCoroutine(SpawnBombInArea());
+
+        yield return null;
+    }
+
+    public void SpawnPattern(string patternTag) 
+    {
+        lastPatternUsed = bombSpawnPatternLibrary.GetPatternByTag(patternTag);
+
+        if (lastPatternUsed)
+        {
+            foreach (Vector2 point in lastPatternUsed.spawnPoints)
+            {
+                Bomb bomb = bombPool?.Get() as Bomb;
+                bomb.transform.position = point;
+            }
+        }
+    }
+
+    Vector2 RandomPositionInArea(float xHalfExt, float yHalfExt) 
+    {
+        float x = Random.Range(-xHalfExt, xHalfExt);
+        float y = Random.Range(-yHalfExt, yHalfExt);
+
+        Vector2 pos = new Vector2(x, y);
+
+        return pos;
     }
 
     public void StopSpawner() 
     {
         Debug.Log("Stop Spawning Bombs!");
+
+        StopAllCoroutines();
+
+        for (int i = 0; i < bombs.Count; i++) 
+        {
+            bombs[i].Explode();
+        }
     }
 
     private Bomb CreateBomb()
@@ -45,6 +99,9 @@ public class BombSpawner : MonoBehaviour
         //Bomb bomb = Instantiate(bombPrefab, transform.position, Quaternion.identity);
         Bomb bomb = container.InstantiatePrefab(bombPrefab, transform.position, Quaternion.identity, null).GetComponent<Bomb>();
         bomb.SetPool(bombPool);
+
+        bombs.Add(bomb);
+
         return bomb;
     }
 
@@ -61,6 +118,7 @@ public class BombSpawner : MonoBehaviour
 
     private void OnDestroyBomb(Actor bomb)
     {
+        Debug.Log("Destroy Bomb");
         Destroy(bomb.gameObject);
     }
 
