@@ -6,8 +6,7 @@ using TMPro;
 
 public class ScoreCounter : MonoBehaviour
 {
-    [Inject]
-    IGameModeScore gameModeScore;
+    [Inject] IGameModeScore gameModeScore;
 
     TMP_Text scoreText;
 

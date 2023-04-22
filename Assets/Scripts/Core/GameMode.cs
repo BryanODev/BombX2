@@ -63,6 +63,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     [SerializeField ] PlayerController playerControllerPrefab;
     PlayerController playerController;
 
+    [Inject]
+    IPlayerUI playerUI;
 
     //Delegates
     public OnGameStart onGameStart;
