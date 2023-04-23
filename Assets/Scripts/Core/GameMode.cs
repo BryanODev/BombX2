@@ -5,7 +5,6 @@ using Zenject;
 
 public delegate void OnGameStart();
 public delegate void OnGameEnd();
-public delegate void OnGameScoreChange(int score);
 
 public enum GameState
 {
@@ -18,7 +17,6 @@ public enum GameState
 
 public interface IGameModeScore 
 {
-    public OnGameScoreChange OnGameScoreChangeDelegate { get; set; }
     public int GameScore { get; }
     public void AddScore(int scoreToAdd);
 }
@@ -36,7 +34,6 @@ public interface IGameModeEvents
 {
     public OnGameStart OnGameStartDelegate { get; set; }
     public OnGameEnd onGameEndDelegate { get; set; }
-    public OnGameScoreChange OnGameScoreChangeDelegate { get; set; }
 }
 
 //This class will be the base of the gameplay loop. Will be incharge of stuff like spawning the player, starting the game, ending and more.
@@ -49,6 +46,7 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     bool gameEnded;
 
     int gameScore;
+
     public int GameScore { get { return gameScore; } }
 
     public bool GameStarted { get { return gameStarted; } }
@@ -69,13 +67,9 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     //Delegates
     public OnGameStart onGameStart;
     public OnGameEnd onGameEnd;
-    public OnGameScoreChange onGameScoreChange;
 
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
-    public OnGameScoreChange OnGameScoreChangeDelegate { get { return onGameScoreChange; } set { onGameScoreChange += value; } }
-
-
     Coroutine gameStartTimer;
 
     public virtual void Awake()
@@ -120,16 +114,21 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         //Find or Spawn a PlayerCamera & assign to follow the player character spawned
 
         //On Game Finish Initialization, Change to Starting Game
-        currentState = GameState.StartingGame;
+        currentState = GameState.WaitingToStart;
 
         //Transition to the Scene
     }
 
     public void HandlingStartingGame() 
     {
-        if (gameStartTimer == null) 
+        Debug.Log("Game Started!");
+
+        gameStarted = true;
+        currentState = GameState.InProcess;
+
+        if (onGameStart != null)
         {
-            gameStartTimer = StartCoroutine(StartGameTimer(3));
+            onGameStart();
         }
     }
 
@@ -142,21 +141,16 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
             yield return null;
         }
 
-        StartGame();
+        currentState = GameState.StartingGame;
 
         yield return null;
     }
 
     public virtual void StartGame()
     {
-        Debug.Log("Game Started!");
-
-        gameStarted = true;
-        currentState = GameState.InProcess;
-
-        if (onGameStart != null)
+        if (gameStartTimer == null)
         {
-            onGameStart();
+            gameStartTimer = StartCoroutine(StartGameTimer(3));
         }
     }
 
@@ -200,11 +194,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     {
         gameScore += scoreToAdd;
 
-        if (onGameScoreChange != null) 
-        {
-            onGameScoreChange(gameScore);
-        }
-
+        //Refresh PlayerUI.
+        playerUI?.scoreCounter.OnScoreChange(gameScore);
     }
 
 }

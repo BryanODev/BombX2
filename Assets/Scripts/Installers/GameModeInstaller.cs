@@ -12,6 +12,7 @@ public class GameModeInstaller : MonoInstaller<GameModeInstaller>
 
         //// Bind the GameMode class as a singleton
         Container.Bind<GameMode>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<IPlayerUI>().To<PlayerUI>().FromComponentInHierarchy().AsSingle();
         
         // Bind the IGameModeState and IGameModeEvents interfaces
         Container.Bind<IGameModeState>().To<GameMode>().FromResolve();

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IPlayerUI 
 {
+    public ScoreCounter scoreCounter { get;}
     public ScreenTransition ScreenTransitionController { get; }
     public T GetMenu<T>() where T : Widget;
 }
@@ -17,9 +18,13 @@ public class PlayerUI : MonoBehaviour, IPlayerUI
     ScreenTransition screenTransitionController;
     public ScreenTransition ScreenTransitionController { get { return screenTransitionController; } private set { } }
 
+    ScoreCounter _scoreCounter;
+    public ScoreCounter scoreCounter { get { return _scoreCounter; } }
+
     private void Awake()
     {
         screenTransitionController = GetComponentInChildren<ScreenTransition>();
+        _scoreCounter = GetComponentInChildren<ScoreCounter>();
     }
 
     private void Start()
@@ -31,8 +36,8 @@ public class PlayerUI : MonoBehaviour, IPlayerUI
             menus[i].Initialize(this);
         }
 
-        OpenMenu<PlayerHUD>();
-        CloseAllMenusExclusive(GetMenu<PlayerHUD>());
+        OpenMenu<MainScreen>();
+        CloseAllMenusExclusive(GetMenu<MainScreen>());
     }
 
     public T GetMenu<T>() where T : Widget

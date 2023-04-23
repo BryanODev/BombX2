@@ -18,6 +18,7 @@ public interface IGameInstance
 
 public class GameInstance : IGameInstance
 {
+
     DiContainer container;
 
     //[SerializeField] private GameSettings gameSettings;
