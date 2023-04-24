@@ -37,11 +37,14 @@ public class Bomb : Actor
     IAudioManager audioManager;
     public AudioClip bombExplosionSFX;
 
+    Material bombMaterialInstance;
+
     public override void Awake()
     {
         base.Awake();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        bombMaterialInstance = spriteRenderer.material;
 
         currentBombTimer = bombTimer;
     }
@@ -197,6 +200,16 @@ public class Bomb : Actor
     }
 
     public void SetSpriteRendererColor(Color newColor) { spriteRenderer.color = newColor; }
+
+    public void SetBombID(int id) 
+    { 
+        bombID = id; 
+    }
+
+    public void SetBombColor(Color bombColor) 
+    {
+        bombMaterialInstance.SetColor("_BombColor", bombColor);
+    }
 
     public override void ResetTransformScale()
     {

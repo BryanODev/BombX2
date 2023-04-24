@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Pattern Library", menuName = "Bomb/BombSpawner/PatternLibrary", order = 0)]
+[CreateAssetMenu(fileName = "New Pattern Library", menuName = "Bomb/BombSpawner/PatternLibrary", order = 1)]
 public class BombSpawnPatternLibrary : ScriptableObject
 {
     public List<BombSpawnPatternData> patterns = new List<BombSpawnPatternData>();
@@ -31,6 +31,22 @@ public class BombSpawnPatternLibrary : ScriptableObject
         Debug.LogWarning("Pattern with index: " + index + " doesn't exist.");
         return null;
     }
+
+    public List<BombSpawnPattern> GetPatternsByDifficulty(int difficulty) 
+    {
+        List<BombSpawnPattern> patternsWithDifficulty = new List<BombSpawnPattern> ();
+
+        foreach (BombSpawnPatternData bombSpawnPatternData in patterns)
+        {
+            if (bombSpawnPatternData.difficulty <= difficulty)
+            {
+                patternsWithDifficulty.Add(bombSpawnPatternData.pattern);
+            }
+        }
+
+        return patternsWithDifficulty;
+    }
+
 }
 
 [System.Serializable]
@@ -38,4 +54,5 @@ public class BombSpawnPatternData
 {
     public string patternTag;
     public BombSpawnPattern pattern;
+    public int difficulty;
 }

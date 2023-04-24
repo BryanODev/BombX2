@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New BombSpawn Pattern", menuName = "Bomb/BombSpawner/Pattern", order = 1)]
+[CreateAssetMenu(fileName = "New BombSpawn Pattern", menuName = "Bomb/BombSpawner/Pattern", order = 2)]
 public class BombSpawnPattern : ScriptableObject
 {
     public Vector2 globalPosition = Vector2.zero;

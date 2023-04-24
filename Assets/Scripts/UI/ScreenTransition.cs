@@ -11,13 +11,15 @@ public class ScreenTransition : MonoBehaviour, ITweenOwnerListener
     ITweenEffect _transitionOut;
     public Vector2 _aPosition;
     public Vector2 _bPosition;
+    public Vector2 _cPosition;
     public AnimationCurve curve;
     public float duration = .5f;
 
     private void Awake()
     {
-        _transitionIn = new TweenScaler(GetComponent<RectTransform>(), _aPosition, _bPosition, duration, curve, this);
-        _transitionOut = new TweenScaler(GetComponent<RectTransform>(), _bPosition, _aPosition, duration, curve, this);
+        _transitionOut = new TweenTranslate(GetComponent<RectTransform>(), _aPosition, _bPosition, duration, curve, this);
+        _transitionIn = new TweenTranslate(GetComponent<RectTransform>(), _bPosition, _cPosition, duration, curve, this);
+        
     }
 
     public void OnTweenFinish(ITweenEffect tween)

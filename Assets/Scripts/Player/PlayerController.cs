@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
             Vector3 holdingObjectPos = playerCamera.ScreenToWorldPoint(playerInput.MainControls.TouchPosition.ReadValue<Vector2>());
             holdingObjectPos.z = 0;
 
-            if (holdingObject != null)
+            if (holdingObject != null && holdingObject.IsSelectable)
             {
                 holdingObject.selectableRigidbody.velocity = (holdingObjectPos - holdingObject.selectableTransform.position) * 10;
                 //holdingObject.selectableTransform.position = holdingObjectPos;

@@ -93,6 +93,7 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     public void Start()
     {
         audioManager.PlayerRandomMusic();
+        playerUI.ScreenTransitionController.TransitionIn();
     }
 
     public virtual void Update()

@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;
 
+[System.Serializable]
+public class BombTeam
+{
+    public int bombTeamIndex;
+    public Color bombColor;
+}
+
 public class BombSpawner : MonoBehaviour
 {
     [SerializeField] private Bomb bombPrefab;
@@ -13,14 +20,19 @@ public class BombSpawner : MonoBehaviour
 
     [Inject]
     DiContainer container;
-    
+
+    [Inject] IGameModeScore gameModeScore;
     [Inject] IGameModeEvents gameModeEvents;
     [Inject] IGameModeState gameModeState;
 
     [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
     private BombSpawnPattern lastPatternUsed;
 
-    int bombSpawningTimeMultiplier = 1;
+    float bombSpawningSecondsToWait = 2;
+    int patternCooldownTime = 5;
+
+    [SerializeField] BombTeam[] bombTeams;
+    [SerializeField] BombSpawnerLevel[] bombSpawnLevel;
 
     private void Awake()
     {
@@ -40,28 +52,170 @@ public class BombSpawner : MonoBehaviour
     {
         Debug.Log("Start Spawning Bombs!");
 
-        StartCoroutine(SpawnBombInArea());
+        StartCoroutine(SelectSpawnMethod());
     }
 
-    IEnumerator SpawnBombInArea()
+    public IEnumerator SelectSpawnMethod() 
     {
-        Bomb bomb = bombPool?.Get() as Bomb;
-        
-        if (bomb) 
+        int patternCooldown = 0;
+        float secondsToWaitForSpawn = 2;
+
+        while (!gameModeState.GameEnded)
         {
-            bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2f), Quaternion.identity);
+            if (gameModeScore.GameScore >= 0 && gameModeScore.GameScore < 10)
+            {
+                //Level 1
+                SpawnBombInArea();
+            }
+
+            if (gameModeScore.GameScore >= 10 && gameModeScore.GameScore < 20)
+            {
+                //Level 2
+                secondsToWaitForSpawn = 1.5f;
+
+                float singleBombProbability = 0.75f;
+                float singleBombOrPattern = Random.value;
+
+                if (patternCooldown == 0) 
+                {
+                    singleBombOrPattern = 1;
+                }
+
+                if (singleBombOrPattern < singleBombProbability)
+                {
+                    SpawnBombInArea();
+                }
+                else
+                {
+                    patternCooldown = patternCooldownTime;
+                    SpawnRandomPatternByDifficulty(0);
+                    secondsToWaitForSpawn += 1;
+                }
+            }
+
+            if (gameModeScore.GameScore >= 20 && gameModeScore.GameScore < 30)
+            {
+                //Level 3
+                secondsToWaitForSpawn = 1.5f;
+
+                float singleBombProbability = 0.75f;
+                float singleBombOrPattern = Random.value;
+
+
+                if (patternCooldown == 0)
+                {
+                    singleBombOrPattern = 1;
+                }
+
+
+                if (singleBombOrPattern < singleBombProbability)
+                {
+                    SpawnBombInArea();
+                }
+                else
+                {
+                    patternCooldown = patternCooldownTime;
+                    SpawnRandomPatternByDifficulty(2);
+                    secondsToWaitForSpawn += 1;
+                }
+            }
+
+            if (gameModeScore.GameScore >= 30 && gameModeScore.GameScore < 40)
+            {
+                //Level 4
+                secondsToWaitForSpawn = 1f;
+
+                float singleBombProbability = 0.75f;
+                float singleBombOrPattern = Random.value;
+
+                if (patternCooldown == 0)
+                {
+                    singleBombOrPattern = 1;
+                }
+
+                if (singleBombOrPattern < singleBombProbability)
+                {
+                    SpawnBombInArea();
+                }
+                else
+                {
+                    patternCooldown = patternCooldownTime;
+                    SpawnRandomPatternByDifficulty(4);
+                    secondsToWaitForSpawn += 1;
+                }
+            }
+
+            if (gameModeScore.GameScore >= 50)
+            {
+                //Level 5
+                secondsToWaitForSpawn = 1f;
+
+                float singleBombProbability = 0.65f;
+                float singleBombOrPattern = Random.value;
+
+                if (patternCooldown == 0)
+                {
+                    singleBombOrPattern = 1;
+                }
+
+                if (singleBombOrPattern < singleBombProbability)
+                {
+                    SpawnBombInArea();
+                }
+                else
+                {
+                    patternCooldown = patternCooldownTime;
+                    SpawnRandomPatternByDifficulty(5);
+                    secondsToWaitForSpawn += 1;
+                }
+            }
+
+            patternCooldown -= 1;
+            yield return new WaitForSeconds(secondsToWaitForSpawn);
         }
 
-        yield return new WaitForSeconds(2);
-
-        StartCoroutine(SpawnBombInArea());
-
         yield return null;
+    }
+
+
+    void SpawnBomb(Vector3 position, Quaternion rotation) 
+    {
+        Bomb bomb = bombPool?.Get() as Bomb;
+        int randomTeam = Random.Range(0, bombTeams.Length);
+
+        if (bomb)
+        {
+            bomb.transform.SetPositionAndRotation(position, rotation);
+
+            bomb.SetBombID(bombTeams[randomTeam].bombTeamIndex);
+            bomb.SetBombColor(bombTeams[randomTeam].bombColor);
+        }
+    }
+
+    void SpawnBombInArea()
+    {
+        SpawnBomb(RandomPositionInArea(2f, 2f), Quaternion.identity);
     }
 
     public void SpawnPattern(string patternTag) 
     {
         lastPatternUsed = bombSpawnPatternLibrary.GetPatternByTag(patternTag);
+
+        if (lastPatternUsed)
+        {
+            foreach (Vector2 point in lastPatternUsed.spawnPoints)
+            {
+                SpawnBomb(point, Quaternion.identity);
+            }
+        }
+    }
+
+    public void SpawnRandomPatternByDifficulty(int difficulty)
+    {
+        List<BombSpawnPattern> patterns = bombSpawnPatternLibrary.GetPatternsByDifficulty(difficulty);
+        int getRandomIndexPattern = Random.Range(0, patterns.Count);
+
+        lastPatternUsed = patterns[getRandomIndexPattern];
 
         if (lastPatternUsed)
         {
@@ -161,18 +315,7 @@ public class BombSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                Bomb bomb = bombPool?.Get() as Bomb;
-
-                if (bomb)
-                {
-                    bomb.transform.SetPositionAndRotation(RandomPositionInArea(2f, 2.5f), Quaternion.identity);
-                }
-            }
-        }
+        
     }
 
     private void OnDrawGizmos()

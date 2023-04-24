@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: PatternLibrary
   m_EditorClassIdentifier: 
   patterns:
-  - patternTag: Single
-    pattern: {fileID: 11400000, guid: 8f723c68c36b29f4abbb12423681860e, type: 2}
   - patternTag: S-Shape
     pattern: {fileID: 11400000, guid: 390ffde21b417e3419fc7602099ea407, type: 2}
+    difficulty: 0
   - patternTag: 4-BombCube
     pattern: {fileID: 11400000, guid: 5e49e97d52fa73d41b9f8f9fa9671543, type: 2}
+    difficulty: 0
