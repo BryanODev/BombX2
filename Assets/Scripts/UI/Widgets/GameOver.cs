@@ -1,18 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameOver : Widget
 {
     // Start is called before the first frame update
-    void Start()
+    public void RestartGame() 
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //For now
+        SceneManager.LoadScene(0);
     }
 }

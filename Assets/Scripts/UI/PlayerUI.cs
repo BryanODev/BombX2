@@ -7,6 +7,7 @@ public interface IPlayerUI
     public ScoreCounter scoreCounter { get;}
     public ScreenTransition ScreenTransitionController { get; }
     public T GetMenu<T>() where T : Widget;
+    public void OpenMenu<W>() where W : Widget;
 }
 
 public class PlayerUI : MonoBehaviour, IPlayerUI

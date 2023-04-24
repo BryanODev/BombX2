@@ -67,6 +67,7 @@ public class Bomb : Actor
 
     public IEnumerator BombTimer() 
     {
+        float timeElapsedRaw = 0;
         float timeElapsed = 0;
 
         while(currentBombTimer > 0) 
@@ -76,10 +77,11 @@ public class Bomb : Actor
             //Make bomb grow and shrink when only 3 seconds are left.
             if (currentBombTimer < 3) 
             {
-                float sineValue = bombAmplitude * Mathf.Sin(Time.time * (timeElapsed * bombDenotateSpeedMultiplier)) + bombDenotateScaleStart;
+                float sineValue = bombAmplitude * Mathf.Sin(timeElapsedRaw * (timeElapsed * bombDenotateSpeedMultiplier)) + bombDenotateScaleStart;
                 sineValue = Mathf.Abs(sineValue);
 
                 bombSprite.localScale = new Vector3(sineValue, sineValue, sineValue);
+                timeElapsedRaw += Time.deltaTime;
                 timeElapsed += Time.deltaTime * bombDenotateSpeed;
             }
 
@@ -101,6 +103,30 @@ public class Bomb : Actor
         gameModeScore.AddScore(1);
 
         spriteRenderer.color = defusedColor;
+
+        StopCoroutine(bounceCouroutine);
+        StartCoroutine(FallObject(1));
+    }
+
+    public IEnumerator FallObject(float fallSpeed) 
+    {
+        Debug.Log("Fall");
+        float timeElapsed = 0;
+        Vector3 ToScale = new Vector3(0.05f, 0.05f, 0.05f);
+        Vector3 currentScale = transform.localScale;
+
+        while (transform.localScale != ToScale) 
+        {
+            transform.localScale = Vector3.Lerp(currentScale, ToScale, timeElapsed);
+            timeElapsed += Time.deltaTime;
+
+            yield return null;
+        }
+
+        Debug.Log("Fnished Falling");
+        ReleaseToPool();
+
+        yield return null;
     }
 
     public void Explode() 
@@ -108,6 +134,8 @@ public class Bomb : Actor
         Debug.Log("Boom!");
 
         if (!isAlive) { return; }
+
+        canBeSelected = false;
 
         rb.velocity = Vector3.zero;
 

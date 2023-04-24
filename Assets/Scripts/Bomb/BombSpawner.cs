@@ -15,6 +15,7 @@ public class BombSpawner : MonoBehaviour
     DiContainer container;
     
     [Inject] IGameModeEvents gameModeEvents;
+    [Inject] IGameModeState gameModeState;
 
     [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
     private BombSpawnPattern lastPatternUsed;
@@ -121,6 +122,11 @@ public class BombSpawner : MonoBehaviour
                 yield return null;
             }
         }
+
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("Finished exploding");
+        gameModeState.ShowGameOverScreen();
 
         yield return null;
     }

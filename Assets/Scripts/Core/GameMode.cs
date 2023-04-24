@@ -26,6 +26,8 @@ public interface IGameModeState
     void StartGame();
     void EndGame();
 
+    void ShowGameOverScreen();
+
     bool GameStarted { get; }
     bool GameEnded { get; }
 }
@@ -64,13 +66,15 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     [Inject]
     IPlayerUI playerUI;
 
+    [Inject] IAudioManager audioManager;
+
     //Delegates
     public OnGameStart onGameStart;
     public OnGameEnd onGameEnd;
 
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
-    Coroutine gameStartTimer;
+
 
     public virtual void Awake()
     {
@@ -84,6 +88,11 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         //}
 
         currentState = GameState.Initializing;
+    }
+
+    public void Start()
+    {
+        audioManager.PlayerRandomMusic();
     }
 
     public virtual void Update()
@@ -121,6 +130,12 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
 
     public void HandlingStartingGame() 
     {
+ 
+    }
+
+
+    public virtual void StartGame()
+    {
         Debug.Log("Game Started!");
 
         gameStarted = true;
@@ -129,28 +144,6 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         if (onGameStart != null)
         {
             onGameStart();
-        }
-    }
-
-    public IEnumerator StartGameTimer(float timeDuration) 
-    {
-        while (timeDuration > 0) 
-        {
-            Debug.Log(Mathf.RoundToInt(timeDuration));
-            timeDuration -= Time.deltaTime;
-            yield return null;
-        }
-
-        currentState = GameState.StartingGame;
-
-        yield return null;
-    }
-
-    public virtual void StartGame()
-    {
-        if (gameStartTimer == null)
-        {
-            gameStartTimer = StartCoroutine(StartGameTimer(3));
         }
     }
 
@@ -175,6 +168,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         }
 
         gameEnded = true;
+
+        audioManager.FadeMusicVolumen(0.5f, 0);
     }
 
     public bool HasGameStarted()
@@ -198,4 +193,8 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         playerUI?.scoreCounter.OnScoreChange(gameScore);
     }
 
+    public void ShowGameOverScreen()
+    {
+        playerUI.OpenMenu<GameOver>();
+    }
 }

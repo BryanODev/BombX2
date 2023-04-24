@@ -14,7 +14,7 @@ public interface ISelectable
 
 public class Actor : MonoBehaviour, ISelectable
 {
-    Coroutine bounceCouroutine;
+    protected Coroutine bounceCouroutine;
     bool bouncing = false;
 
     protected Rigidbody2D rb;
@@ -165,6 +165,7 @@ public class Actor : MonoBehaviour, ISelectable
 
     public virtual void OnEnable() 
     {
+        canBeSelected = true;
         //When enabled, we runt he drop actor animation
         DropActor();
     }

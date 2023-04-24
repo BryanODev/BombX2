@@ -48,3 +48,6 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: f2eb3525d34f00845a08f070f7fc81e5, type: 2}
   musicAudioMixerGroup: {fileID: 6634585039641767121, guid: f2eb3525d34f00845a08f070f7fc81e5, type: 2}
   sfxAudioMixerGroup: {fileID: -8397006021880115932, guid: f2eb3525d34f00845a08f070f7fc81e5, type: 2}
+  musics:
+  - {fileID: 8300000, guid: f08a7b637c3b1fb42ad695407eb88a77, type: 3}
+  - {fileID: 8300000, guid: 7a582f6fb8fd44046899e753149a3fc6, type: 3}

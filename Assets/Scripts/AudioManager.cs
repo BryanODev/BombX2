@@ -7,7 +7,9 @@ using Zenject;
 public interface IAudioManager
 {
     void PlayOneShotSound(AudioClip audioClipToPlay);
-    void PlayDefaultMusic();
+    void PlayerRandomMusic();
+
+    void FadeMusicVolumen(float duration, float toVolumen);
 
     void ToggleMusicMute();
     void ToggleSFXMute();
@@ -25,6 +27,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
     public AudioMixer audioMixer;
     public AudioMixerGroup musicAudioMixerGroup;
     public AudioMixerGroup sfxAudioMixerGroup;
+
+    public AudioClip[] musics;
 
     bool musicMuted;
     public bool MusicMuted { get { return musicMuted; } }
@@ -47,8 +51,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
         sfxAudioSource.outputAudioMixerGroup = sfxAudioMixerGroup;
 
         LoadAudioSettings();
-
-        PlayDefaultMusic();
     }
 
     public void LoadAudioSettings() 
@@ -79,15 +81,40 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     }
 
-    public void PlayDefaultMusic() 
+    public void PlayerRandomMusic() 
     {
-        if (deafultMusicToPlay != null)
+        int musicIndex = Random.Range(0, musics.Length);
+
+        if (musics[musicIndex] != null)
         {
-            musicAudioSource.clip = deafultMusicToPlay;
+            musicAudioSource.clip = musics[musicIndex];
             musicAudioSource.loop = true;
             musicAudioSource.Play();
+            musicAudioSource.volume = 1;
         }
+    
     }
+
+    public void FadeMusicVolumen(float duration, float toVolumen) 
+    {
+        StartCoroutine(FadeMusicVolumenC(duration, toVolumen));
+    }
+
+    public IEnumerator FadeMusicVolumenC(float duration, float toVolumen) 
+    {
+        float timeElapsed = 0;
+        float musicVolumen = musicAudioSource.volume;
+
+        while (musicAudioSource.volume != toVolumen) 
+        {
+            musicAudioSource.volume = Mathf.Lerp(musicVolumen, toVolumen, timeElapsed / duration);
+            timeElapsed += Time.deltaTime;
+        }
+
+
+        yield return null;
+    }
+
 
     public void PlayMusic(AudioClip audioClipToPlay) 
     {

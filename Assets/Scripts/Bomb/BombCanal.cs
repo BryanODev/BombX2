@@ -42,12 +42,12 @@ public class BombCanal : MonoBehaviour, IBombTrigger
 
     public virtual void OnBombEnter(Bomb bomb) 
     {
-       
         bomb.canBeSelected = false;
 
         if (bomb.bombID == bombID)
         {
             bomb.DefuseBomb();
+            StartCoroutine(PullBomb(bomb.transform, 1));
         }
         else
         {
@@ -55,6 +55,23 @@ public class BombCanal : MonoBehaviour, IBombTrigger
             bomb.Explode();
         }
 
+    }
+
+    public IEnumerator PullBomb(Transform bomb,float speed) 
+    {
+        float timeElapsed = 0;
+        Vector3 FromPos = bomb.position;
+        Vector3 ToPos = transform.position;
+
+        while (bomb.position != ToPos) 
+        {
+            bomb.position = Vector3.Lerp(FromPos, ToPos, timeElapsed);
+            timeElapsed += Time.deltaTime * speed;
+
+            yield return null;
+        }
+
+        yield return null;
     }
 
 

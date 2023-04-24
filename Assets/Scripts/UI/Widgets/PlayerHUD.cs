@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class PlayerHUD : Widget
 {
-    // Start is called before the first frame update
-    void Start()
+    GameStartCounter counter;
+
+    private void Start()
     {
-        
+        counter = GetComponentInChildren<GameStartCounter>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OpenMenu()
     {
-        
+        base.OpenMenu();
+        counter.StartGameTimer();
     }
 }

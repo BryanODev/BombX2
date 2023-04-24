@@ -265,8 +265,8 @@ MonoBehaviour:
   bombTimer: 8
   defusedColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   bombAmplitude: 0.25
-  bombDenotateSpeed: 1.25
-  bombDenotateSpeedMultiplier: 2
+  bombDenotateSpeed: 2
+  bombDenotateSpeedMultiplier: 4
   bombDenotateScaleStart: 1
   bombExplosionSFX: {fileID: 8300000, guid: 9ff6bf790d70f1546b11b8ad20ca6205, type: 3}
 --- !u!50 &8430252725012409828
