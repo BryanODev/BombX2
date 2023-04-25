@@ -13,9 +13,30 @@ MonoBehaviour:
   m_Name: PatternLibrary
   m_EditorClassIdentifier: 
   patterns:
-  - patternTag: S-Shape
-    pattern: {fileID: 11400000, guid: 390ffde21b417e3419fc7602099ea407, type: 2}
+  - patternTag: 2-BombPattern
+    pattern: {fileID: 11400000, guid: 7a5261962f5e88d4986137cf93ca30ff, type: 2}
     difficulty: 0
+  - patternTag: 4Diamond-Shape
+    pattern: {fileID: 11400000, guid: b220ce43893a80a42adad70ac1a1df41, type: 2}
+    difficulty: 0
+  - patternTag: PlusSymbol-Shape
+    pattern: {fileID: 11400000, guid: 2579bbb021ff33d4d9a1d304ba5e9e79, type: 2}
+    difficulty: 0
+  - patternTag: Tear-Shape
+    pattern: {fileID: 11400000, guid: 2d5b493b20a285c4386c630a22f1a9b3, type: 2}
+    difficulty: 3
   - patternTag: 4-BombCube
     pattern: {fileID: 11400000, guid: 5e49e97d52fa73d41b9f8f9fa9671543, type: 2}
     difficulty: 0
+  - patternTag: BackSlash-Shape
+    pattern: {fileID: 11400000, guid: 2dedf7e40ada26349bfe7e9ac8951ad7, type: 2}
+    difficulty: 3
+  - patternTag: Diamond-Shape
+    pattern: {fileID: 11400000, guid: 9c96f99c1d8994f4b93c851cece863b4, type: 2}
+    difficulty: 3
+  - patternTag: S-Shape
+    pattern: {fileID: 11400000, guid: 390ffde21b417e3419fc7602099ea407, type: 2}
+    difficulty: 5
+  - patternTag: X-Shape
+    pattern: {fileID: 11400000, guid: ccdc48916b882b44c98e6acec8a68982, type: 2}
+    difficulty: 5

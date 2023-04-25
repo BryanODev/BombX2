@@ -63,13 +63,15 @@ public class BombCanal : MonoBehaviour, IBombTrigger
         Vector3 FromPos = bomb.position;
         Vector3 ToPos = transform.position;
 
-        while (bomb.position != ToPos) 
+        while (bomb.position != ToPos && bomb.gameObject.activeSelf) 
         {
             bomb.position = Vector3.Lerp(FromPos, ToPos, timeElapsed);
             timeElapsed += Time.deltaTime * speed;
 
             yield return null;
         }
+
+        Debug.Log("Stop Pulling Bomb to Canal");
 
         yield return null;
     }

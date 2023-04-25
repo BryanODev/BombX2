@@ -173,6 +173,7 @@ public class Actor : MonoBehaviour, ISelectable
     public virtual void OnDisable() 
     {
         isOnGround = false;
+        StopBounceActor();
     }
 
     public virtual void ResetTransformScale() 

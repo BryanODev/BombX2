@@ -9,15 +9,17 @@ public class Bomb : Actor
     [Header("Bomb Sprite")]
     [SerializeField] Transform bombExplosionSprite;
     [SerializeField] Transform bombSprite;
+    Collider2D bombCollider;
 
     [Header("Bomb Gameplay Settings")]
     public bool autoStartTimer = true;
     public int bombID;
     public bool bombDefused;
 
-    [SerializeField] float bombTimer = 8;
+    [SerializeField] public float bombTimer = 8;
     float currentBombTimer;
     Coroutine bombTimerCoroutine;
+    Coroutine fallObjectCoroutine;
 
     [Inject] IGameModeState gameModeState;
     [Inject] IGameModeScore gameModeScore;
@@ -45,6 +47,7 @@ public class Bomb : Actor
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         bombMaterialInstance = spriteRenderer.material;
+        bombCollider = GetComponent<Collider2D>();
 
         currentBombTimer = bombTimer;
     }
@@ -108,7 +111,7 @@ public class Bomb : Actor
         spriteRenderer.color = defusedColor;
 
         StopCoroutine(bounceCouroutine);
-        StartCoroutine(FallObject(1));
+        fallObjectCoroutine = StartCoroutine(FallObject(1));
     }
 
     public IEnumerator FallObject(float fallSpeed) 
@@ -126,7 +129,7 @@ public class Bomb : Actor
             yield return null;
         }
 
-        Debug.Log("Fnished Falling");
+        Debug.Log("Finished Falling");
         ReleaseToPool();
 
         yield return null;
@@ -181,10 +184,13 @@ public class Bomb : Actor
         SetIsAlive(true);
 
         ResetBombSprite();
+
+        isOnGround = false;
     }
 
     public override void OnDisable()
     {
+        base.OnDisable();
         ResetBomb();
     }
 

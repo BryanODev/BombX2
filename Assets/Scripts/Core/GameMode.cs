@@ -67,6 +67,7 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     IPlayerUI playerUI;
 
     [Inject] IAudioManager audioManager;
+    [Inject] IGameInstance gameInstance;
 
     //Delegates
     public OnGameStart onGameStart;
@@ -171,6 +172,9 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
         gameEnded = true;
 
         audioManager.FadeMusicVolumen(0.5f, 0);
+
+        gameInstance.PlayerDataSaved.highScore = gameScore;
+        gameInstance.SaveGameData();
     }
 
     public bool HasGameStarted()

@@ -9,8 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 841bb9ea84def51499b3377ec51fef9c, type: 3}
-  m_Name: Level2
+  m_Script: {fileID: 11500000, guid: ac9ebd9fa0e3a31408e42d1a819d070b, type: 3}
+  m_Name: BackSlash-ShapePattern
   m_EditorClassIdentifier: 
-  singleBombProbability: 0
-  timeBetweenBombs: 0
+  globalPosition: {x: 0, y: 0}
+  spawnPoints:
+  - {x: -2, y: 2}
+  - {x: -1, y: 1}
+  - {x: 0, y: 0}
+  - {x: 1, y: -1}
+  - {x: 2, y: -2}
+  spawnPointIndex: 0

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Zenject;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Camera playerCamera;
 
     ISelectable holdingObject;
+
+    [Inject] IGameModeState gameModeState;
 
     // Start is called before the first frame update
     void Awake()
@@ -31,9 +34,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (gameModeState.GameEnded || !gameModeState.GameStarted) { return; }
+
         if (playerInput.MainControls.TouchPress.WasPressedThisFrame()) 
         {
-            //Debug.Log("Started Touch");
+            Debug.Log("Player Pick Bomb");
 
             Vector2 screenPosition = playerInput.MainControls.TouchPosition.ReadValue<Vector2>();
             TrySelectingObject(screenPosition);
@@ -53,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
         if (playerInput.MainControls.TouchPress.WasReleasedThisFrame()) 
         {
-            //Debug.Log("End Touch");
+            Debug.Log("Player Drop Bomb");
 
             Vector3 holdingObjectPos = playerCamera.ScreenToWorldPoint(playerInput.MainControls.TouchPosition.ReadValue<Vector2>());
             holdingObjectPos.z = 0;

@@ -32,7 +32,13 @@ public class BombSpawner : MonoBehaviour
     int patternCooldownTime = 5;
 
     [SerializeField] BombTeam[] bombTeams;
-    [SerializeField] BombSpawnerLevel[] bombSpawnLevel;
+    [SerializeField] BombSpawnerLevelLibrary bombSpawnLevelLibrary;
+
+    Coroutine bombSpawningCoroutine;
+    Coroutine pattnerSpawnWaitTimeCoroutine;
+    bool patternIsOn;
+
+    public int defaultBombToSpawnFirst = 20;
 
     private void Awake()
     {
@@ -41,6 +47,12 @@ public class BombSpawner : MonoBehaviour
 
     private void Start()
     {
+        //for(int i = 0; i < defaultBombToSpawnFirst; i++) 
+        //{
+        //    Bomb bomb = CreateBomb();
+        //    bomb.ReleaseToPool();
+        //}
+
         if (gameModeEvents != null)
         {
             gameModeEvents.OnGameStartDelegate += StartSpawner;
@@ -52,134 +64,46 @@ public class BombSpawner : MonoBehaviour
     {
         Debug.Log("Start Spawning Bombs!");
 
-        StartCoroutine(SelectSpawnMethod());
+        bombSpawningCoroutine = StartCoroutine(SelectSpawnMethod());
     }
 
     public IEnumerator SelectSpawnMethod() 
     {
-        int patternCooldown = 0;
-        float secondsToWaitForSpawn = 2;
-
         while (!gameModeState.GameEnded)
         {
-            if (gameModeScore.GameScore >= 0 && gameModeScore.GameScore < 10)
+            if (!patternIsOn)
             {
-                //Level 1
-                SpawnBombInArea();
-            }
+                SpawnerLevel currentLevel = bombSpawnLevelLibrary.GetCurrentLevelByScore(gameModeScore.GameScore);
 
-            if (gameModeScore.GameScore >= 10 && gameModeScore.GameScore < 20)
-            {
-                //Level 2
-                secondsToWaitForSpawn = 1.5f;
-
-                float singleBombProbability = 0.75f;
                 float singleBombOrPattern = Random.value;
 
-                if (patternCooldown == 0) 
-                {
-                    singleBombOrPattern = 1;
-                }
+                Debug.Log(currentLevel.singleBombProbability);
 
-                if (singleBombOrPattern < singleBombProbability)
+                if (singleBombOrPattern < currentLevel.singleBombProbability)
                 {
-                    SpawnBombInArea();
+                    Bomb bomb = SpawnBombInArea();
+                    bomb.bombTimer = currentLevel.singleBombExplodeTime;
                 }
                 else
                 {
-                    patternCooldown = patternCooldownTime;
-                    SpawnRandomPatternByDifficulty(0);
-                    secondsToWaitForSpawn += 1;
+                    SpawnRandomPatternByDifficulty(currentLevel.patternLevel, currentLevel);
                 }
+
+                yield return new WaitForSeconds(currentLevel.timeBetweenBombs);
             }
 
-            if (gameModeScore.GameScore >= 20 && gameModeScore.GameScore < 30)
-            {
-                //Level 3
-                secondsToWaitForSpawn = 1.5f;
+            //Debug.Log("Waiting on Pattern");
+            yield return null;
 
-                float singleBombProbability = 0.75f;
-                float singleBombOrPattern = Random.value;
-
-
-                if (patternCooldown == 0)
-                {
-                    singleBombOrPattern = 1;
-                }
-
-
-                if (singleBombOrPattern < singleBombProbability)
-                {
-                    SpawnBombInArea();
-                }
-                else
-                {
-                    patternCooldown = patternCooldownTime;
-                    SpawnRandomPatternByDifficulty(2);
-                    secondsToWaitForSpawn += 1;
-                }
-            }
-
-            if (gameModeScore.GameScore >= 30 && gameModeScore.GameScore < 40)
-            {
-                //Level 4
-                secondsToWaitForSpawn = 1f;
-
-                float singleBombProbability = 0.75f;
-                float singleBombOrPattern = Random.value;
-
-                if (patternCooldown == 0)
-                {
-                    singleBombOrPattern = 1;
-                }
-
-                if (singleBombOrPattern < singleBombProbability)
-                {
-                    SpawnBombInArea();
-                }
-                else
-                {
-                    patternCooldown = patternCooldownTime;
-                    SpawnRandomPatternByDifficulty(4);
-                    secondsToWaitForSpawn += 1;
-                }
-            }
-
-            if (gameModeScore.GameScore >= 50)
-            {
-                //Level 5
-                secondsToWaitForSpawn = 1f;
-
-                float singleBombProbability = 0.65f;
-                float singleBombOrPattern = Random.value;
-
-                if (patternCooldown == 0)
-                {
-                    singleBombOrPattern = 1;
-                }
-
-                if (singleBombOrPattern < singleBombProbability)
-                {
-                    SpawnBombInArea();
-                }
-                else
-                {
-                    patternCooldown = patternCooldownTime;
-                    SpawnRandomPatternByDifficulty(5);
-                    secondsToWaitForSpawn += 1;
-                }
-            }
-
-            patternCooldown -= 1;
-            yield return new WaitForSeconds(secondsToWaitForSpawn);
         }
 
         yield return null;
     }
 
 
-    void SpawnBomb(Vector3 position, Quaternion rotation) 
+    Bomb SpawnBomb(Vector3 position, Quaternion rotation) 
     {
+        Debug.Log("Spawned bomb on pos: " + position);
         Bomb bomb = bombPool?.Get() as Bomb;
         int randomTeam = Random.Range(0, bombTeams.Length);
 
@@ -189,12 +113,16 @@ public class BombSpawner : MonoBehaviour
 
             bomb.SetBombID(bombTeams[randomTeam].bombTeamIndex);
             bomb.SetBombColor(bombTeams[randomTeam].bombColor);
+
+            return bomb;
         }
+
+        return null;
     }
 
-    void SpawnBombInArea()
+    Bomb SpawnBombInArea()
     {
-        SpawnBomb(RandomPositionInArea(2f, 2f), Quaternion.identity);
+       return SpawnBomb(RandomPositionInArea(2f, 2f), Quaternion.identity);
     }
 
     public void SpawnPattern(string patternTag) 
@@ -210,21 +138,55 @@ public class BombSpawner : MonoBehaviour
         }
     }
 
-    public void SpawnRandomPatternByDifficulty(int difficulty)
+    public void SpawnRandomPatternByDifficulty(int difficulty, SpawnerLevel currentLevel)
     {
         List<BombSpawnPattern> patterns = bombSpawnPatternLibrary.GetPatternsByDifficulty(difficulty);
         int getRandomIndexPattern = Random.Range(0, patterns.Count);
 
         lastPatternUsed = patterns[getRandomIndexPattern];
 
+        List<Bomb> bombsInPattern = new List<Bomb>();
+
         if (lastPatternUsed)
         {
-            foreach (Vector2 point in lastPatternUsed.spawnPoints)
+            for (int i = 0; i < lastPatternUsed.spawnPoints.Length; i++) 
             {
-                Bomb bomb = bombPool?.Get() as Bomb;
-                bomb.transform.position = point;
+                Bomb bomb = SpawnBomb(lastPatternUsed.spawnPoints[i], Quaternion.identity);
+                bomb.bombTimer = currentLevel.patternBombExplodeTime;
+                bombsInPattern.Add(bomb);
             }
         }
+
+        patternIsOn = true;
+
+        pattnerSpawnWaitTimeCoroutine = StartCoroutine(WaitForPatternToBeCompleted(bombsInPattern));
+    }
+
+    IEnumerator WaitForPatternToBeCompleted(List<Bomb> bombsInPattern) 
+    {
+        int bombCount = bombsInPattern.Count;
+        int bombDifused = 0;
+
+        while (bombDifused != bombCount) 
+        {
+            int bombTemp = 0;
+            for (int i = 0; i < bombsInPattern.Count; i++) 
+            {
+                if (bombsInPattern[i].bombDefused) 
+                {
+                    bombTemp += 1;
+                }
+            }
+
+            bombDifused = bombTemp;
+
+            yield return null;
+        }
+
+        Debug.Log("All bombs Defused");
+        patternIsOn = false;
+
+        yield return null;
     }
 
     Vector2 RandomPositionInArea(float xHalfExt, float yHalfExt) 
@@ -251,30 +213,30 @@ public class BombSpawner : MonoBehaviour
         for (int i = 0; i < bombs.Count; i++)
         {
             bombs[i].StopBombTimerCoroutine();
+            bombs[i].canBeSelected = false;
             yield return null;
         }
 
-        if (delayPerExplosion <= 0)
+        bool skipExplosionDelay = true;
+
+        for (int i = 0; i < bombs.Count; i++)
         {
-            for (int i = 0; i < bombs.Count; i++)
-            {
-                bombs[i].Explode();
-                yield return null;
-            }
-        }
-        else 
-        {
-            for (int i = 0; i < bombs.Count; i++)
+            if (!skipExplosionDelay)
             {
                 yield return new WaitForSeconds(delayPerExplosion);
-
-                if (!bombs[i].bombDefused && bombs[i].gameObject.activeSelf)
-                {
-                    bombs[i].Explode();
-                }
-
-                yield return null;
             }
+
+            if (!bombs[i].bombDefused && bombs[i].gameObject.activeSelf)
+            {
+                bombs[i].Explode();
+                skipExplosionDelay = false;
+            }
+            else 
+            {
+                skipExplosionDelay = true;
+            }
+
+            yield return null;
         }
 
         yield return new WaitForSeconds(1f);
@@ -298,12 +260,13 @@ public class BombSpawner : MonoBehaviour
 
     private void OnGetBomb(Actor bomb)
     {
-        bomb.gameObject.SetActive(true);
         bomb.transform.position = transform.position;
+        bomb.gameObject.SetActive(true);
     }
 
     private void OnReleaseBomb(Actor bomb)
     {
+        bomb.transform.position = Vector3.zero;
         bomb.gameObject.SetActive(false);
     }
 

@@ -8,12 +8,10 @@ public delegate void OnMeatAmmountChange(int newAmmount);
 public interface IGameInstance
 {
     PlayerData PlayerDataSaved { get; }
-    //GameSettings GetGameSettings { get; }
+    GameSettings GetGameSettings { get; }
 
-    void AddCoins(int ammountToAdd);
+    void SetScore(int newScore);
     void SaveGameData();
-
-    public OnMeatAmmountChange OnMeatAmmountChangeDelegate { get; set; }
 }
 
 public class GameInstance : IGameInstance
@@ -21,34 +19,26 @@ public class GameInstance : IGameInstance
 
     DiContainer container;
 
-    //[SerializeField] private GameSettings gameSettings;
-    //public GameSettings GetGameSettings { get { return gameSettings; } private set { } }
+    [SerializeField] private GameSettings gameSettings;
+    public GameSettings GetGameSettings { get { return gameSettings; } private set { } }
 
     //Used to save and load
     private PlayerData playerDataSaved;
     public PlayerData PlayerDataSaved { get { return playerDataSaved; } }
-
-    public int numberOfLevelsCompletedInARow;
-
-    public OnMeatAmmountChange onMeatAmmountChange;
-    public OnMeatAmmountChange OnMeatAmmountChangeDelegate { get { return onMeatAmmountChange; } set { onMeatAmmountChange += value; } }
 
 
     public GameInstance()
     {
         LoadSaveData();
 
-        //gameSettings = new GameSettings();
-        //gameSettings.Initialize();
+        gameSettings = new GameSettings(true);
     }
 
-    public void AddCoins(int ammountToAdd)
+    public void SetScore(int newScore)
     {
-        playerDataSaved.coinsCollected += ammountToAdd;
-
-        if (onMeatAmmountChange != null)
+        if (newScore > playerDataSaved.highScore)
         {
-            onMeatAmmountChange(playerDataSaved.coinsCollected);
+            playerDataSaved.highScore = newScore;
         }
     }
 
