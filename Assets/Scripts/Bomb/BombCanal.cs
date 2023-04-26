@@ -39,7 +39,6 @@ public class BombCanal : MonoBehaviour, IBombTrigger
        
     }
 
-
     public virtual void OnBombEnter(Bomb bomb) 
     {
         bomb.canBeSelected = false;
@@ -75,6 +74,5 @@ public class BombCanal : MonoBehaviour, IBombTrigger
 
         yield return null;
     }
-
 
 }

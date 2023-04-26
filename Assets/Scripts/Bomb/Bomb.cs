@@ -7,8 +7,10 @@ using Gameplay.GameplayUtilities;
 public class Bomb : Actor
 {
     [Header("Bomb Sprite")]
-    [SerializeField] Transform bombExplosionSprite;
+    SpriteRenderer bombSpriteRenderer;
     [SerializeField] Transform bombSprite;
+    [SerializeField] Transform bombExplosionSprite;
+
     Collider2D bombCollider;
 
     [Header("Bomb Gameplay Settings")]
@@ -27,12 +29,11 @@ public class Bomb : Actor
     [Header("Bomb Animation")]
 
     [SerializeField] Color defusedColor = new Color(0.75f, 0.75f, 0.75f);
-    [SerializeField] float bombAmplitude = .25f;
+    [SerializeField] float bombDenotateAmplitude = .25f;
     [SerializeField] float bombDenotateSpeed = 1.25f;
     [SerializeField] float bombDenotateSpeedMultiplier = 2;
     [SerializeField] float bombDenotateScaleStart = 1.0f;
 
-    SpriteRenderer spriteRenderer;
     bool isAlive = true;
 
     [Inject]
@@ -45,8 +46,9 @@ public class Bomb : Actor
     {
         base.Awake();
 
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        bombMaterialInstance = spriteRenderer.material;
+        bombSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        
+        bombMaterialInstance = bombSpriteRenderer.material;
         bombCollider = GetComponent<Collider2D>();
 
         currentBombTimer = bombTimer;
@@ -71,7 +73,7 @@ public class Bomb : Actor
         }
     }
 
-    public IEnumerator BombTimer() 
+    private IEnumerator BombTimer() 
     {
         float timeElapsedRaw = 0;
         float timeElapsed = 0;
@@ -83,7 +85,7 @@ public class Bomb : Actor
             //Make bomb grow and shrink when only 3 seconds are left.
             if (currentBombTimer < 3) 
             {
-                float sineValue = bombAmplitude * Mathf.Sin(timeElapsedRaw * (timeElapsed * bombDenotateSpeedMultiplier)) + bombDenotateScaleStart;
+                float sineValue = bombDenotateAmplitude * Mathf.Sin(timeElapsedRaw * (timeElapsed * bombDenotateSpeedMultiplier)) + bombDenotateScaleStart;
                 sineValue = Mathf.Abs(sineValue);
 
                 bombSprite.localScale = new Vector3(sineValue, sineValue, sineValue);
@@ -101,22 +103,22 @@ public class Bomb : Actor
     {
         if (bombDefused) { return; }
 
-        
-        ResetBomb();
         bombDefused = true;
-
+        ResetBomb();
+        
         //We add a score!
         gameModeScore.AddScore(1);
 
-        spriteRenderer.color = defusedColor;
+        SetSpriteRendererColor(defusedColor);
 
-        StopCoroutine(bounceCouroutine);
+        //Make sure we stop bouce coroutine so it doesn't fight with the FallObject coroutine.
+        StopCoroutine(bounceCoroutine);
         fallObjectCoroutine = StartCoroutine(FallObject(1));
     }
 
-    public IEnumerator FallObject(float fallSpeed) 
+    //Note: This function can be on Actor. For now we can leave it here, since we only have bombs as actors. But eventually, if we add more types of actors, this would be good in the Actor Class.
+    private IEnumerator FallObject(float fallSpeed) 
     {
-        Debug.Log("Fall");
         float timeElapsed = 0;
         Vector3 ToScale = new Vector3(0.05f, 0.05f, 0.05f);
         Vector3 currentScale = transform.localScale;
@@ -129,7 +131,7 @@ public class Bomb : Actor
             yield return null;
         }
 
-        Debug.Log("Finished Falling");
+        //For now, since Fall Object means the object went trought the canal, we release to pool, disabling the gameobject.
         ReleaseToPool();
 
         yield return null;
@@ -137,12 +139,13 @@ public class Bomb : Actor
 
     public void Explode() 
     {
-        Debug.Log("Boom!");
-
         if (!isAlive) { return; }
+
+        isAlive = false;
 
         canBeSelected = false;
 
+        //We 0 velocity to prevent the bomb explosion to slide over the level.
         rb.velocity = Vector3.zero;
 
         audioManager?.PlayOneShotSound(bombExplosionSFX);
@@ -153,8 +156,6 @@ public class Bomb : Actor
             StopCoroutine(bombTimerCoroutine);
         }
 
-        isAlive = false;
-
         if (gameModeState.GameStarted && !gameModeState.GameEnded)
         {
             gameModeState?.EndGame();
@@ -164,19 +165,24 @@ public class Bomb : Actor
         bombSprite.gameObject.SetActive(false);
         bombExplosionSprite.gameObject.SetActive(true);
 
-        //StartCoroutine(ReleaseToPoolAfterSeconds(1f));
+        //If we were gonna give player lives, we can ReLeaseToPoolAfterSeconds(), so it goes back to pool to be reused.
+        //ReleaseToPoolAfterSeconds(1f);
     }
 
-    void ResetBomb() 
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        ResetBomb();
+    }
+
+    //Resets the bomb. This is important since we reuse the bomb. When its released to pool / disabled, it will reset.
+    void ResetBomb()
     {
         //Reset bomb timer
         ResetTimer();
 
         //Stop couroutines
         StopBombTimerCoroutine();
-
-        //Reset color to white/default
-        SetSpriteRendererColor(Color.white);
 
         //Reset Scaling of object and sprite
         ResetTransformScale();
@@ -188,13 +194,10 @@ public class Bomb : Actor
         isOnGround = false;
     }
 
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        ResetBomb();
+    void ResetTimer() 
+    { 
+        currentBombTimer = bombTimer; 
     }
-
-    void ResetTimer() { currentBombTimer = bombTimer; }
 
     public void StopBombTimerCoroutine()
     {
@@ -205,13 +208,17 @@ public class Bomb : Actor
         }
     }
 
-    public void SetSpriteRendererColor(Color newColor) { spriteRenderer.color = newColor; }
+    public void SetSpriteRendererColor(Color newColor) 
+    { 
+        bombSpriteRenderer.color = newColor; 
+    }
 
     public void SetBombID(int id) 
     { 
         bombID = id; 
     }
 
+    //Not to be confused with SpriteRendere color. The bomb color uses materials properties, SpriteRenderer is on top.
     public void SetBombColor(Color bombColor) 
     {
         bombMaterialInstance.SetColor("_BombColor", bombColor);
@@ -220,7 +227,7 @@ public class Bomb : Actor
     public override void ResetTransformScale()
     {
         base.ResetTransformScale();
-        bombSprite.localScale = Vector3.one; ;
+        bombSprite.localScale = Vector3.one;
     }
 
     public void SetIsAlive(bool newIsAlive) 
@@ -232,5 +239,8 @@ public class Bomb : Actor
     {
         bombSprite.gameObject.SetActive(true);
         bombExplosionSprite.gameObject.SetActive(false);
+
+        //Reset color to white/default
+        SetSpriteRendererColor(Color.white);
     }
 }

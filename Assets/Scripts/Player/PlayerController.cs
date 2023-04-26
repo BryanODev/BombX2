@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
             if (holdingObject != null && holdingObject.IsSelectable)
             {
-                holdingObject.selectableRigidbody.velocity = (holdingObjectPos - holdingObject.selectableTransform.position) * 10;
+                holdingObject.SelectableRigidbody.velocity = (holdingObjectPos - holdingObject.SelectableTransform.position) * 10;
                 //holdingObject.selectableTransform.position = holdingObjectPos;
             }
         }
@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
 
             if (holdingObject != null && holdingObject.IsSelectable)
             {
-                holdingObject.selectableRigidbody.velocity = (holdingObjectPos - holdingObject.selectableTransform.position) * 10;
+                holdingObject.SelectableRigidbody.velocity = (holdingObjectPos - holdingObject.SelectableTransform.position) * 10;
                 //holdingObject.selectableTransform.position = holdingObjectPos;
                 holdingObject.OnDiselect();
                 holdingObject = null;

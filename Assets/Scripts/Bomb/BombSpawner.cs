@@ -13,32 +13,26 @@ public class BombTeam
 
 public class BombSpawner : MonoBehaviour
 {
-    [SerializeField] private Bomb bombPrefab;
-
-    private ObjectPool<Actor> bombPool;
-    public List<Bomb> bombs = new List<Bomb>();
-
     [Inject]
     DiContainer container;
+
+    [SerializeField] private Bomb bombPrefab;
+    private ObjectPool<Actor> bombPool;
+    private List<Bomb> bombs = new List<Bomb>(); //Used to hold all bombs spawned to then be able to explode them all on game lost.
 
     [Inject] IGameModeScore gameModeScore;
     [Inject] IGameModeEvents gameModeEvents;
     [Inject] IGameModeState gameModeState;
 
-    [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
-    private BombSpawnPattern lastPatternUsed;
-
-    float bombSpawningSecondsToWait = 2;
-    int patternCooldownTime = 5;
-
     [SerializeField] BombTeam[] bombTeams;
+    [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
     [SerializeField] BombSpawnerLevelLibrary bombSpawnLevelLibrary;
+
+    private BombSpawnPattern lastPatternUsed;
 
     Coroutine bombSpawningCoroutine;
     Coroutine pattnerSpawnWaitTimeCoroutine;
-    bool patternIsOn;
-
-    public int defaultBombToSpawnFirst = 20;
+    bool waitingOnPatternClear;
 
     private void Awake()
     {
@@ -47,7 +41,8 @@ public class BombSpawner : MonoBehaviour
 
     private void Start()
     {
-        //for(int i = 0; i < defaultBombToSpawnFirst; i++) 
+        //Would be nice to spawn some bombs initially, and then use rather than spawning on use? For now we comment it. 
+        //for(int i = 0; i < 20; i++) 
         //{
         //    Bomb bomb = CreateBomb();
         //    bomb.ReleaseToPool();
@@ -71,13 +66,11 @@ public class BombSpawner : MonoBehaviour
     {
         while (!gameModeState.GameEnded)
         {
-            if (!patternIsOn)
+            if (!waitingOnPatternClear)
             {
                 SpawnerLevel currentLevel = bombSpawnLevelLibrary.GetCurrentLevelByScore(gameModeScore.GameScore);
 
                 float singleBombOrPattern = Random.value;
-
-                Debug.Log(currentLevel.singleBombProbability);
 
                 if (singleBombOrPattern < currentLevel.singleBombProbability)
                 {
@@ -100,10 +93,9 @@ public class BombSpawner : MonoBehaviour
         yield return null;
     }
 
-
     Bomb SpawnBomb(Vector3 position, Quaternion rotation) 
     {
-        Debug.Log("Spawned bomb on pos: " + position);
+        //Debug.Log("Spawned bomb on pos: " + position);
         Bomb bomb = bombPool?.Get() as Bomb;
         int randomTeam = Random.Range(0, bombTeams.Length);
 
@@ -157,7 +149,7 @@ public class BombSpawner : MonoBehaviour
             }
         }
 
-        patternIsOn = true;
+        waitingOnPatternClear = true;
 
         pattnerSpawnWaitTimeCoroutine = StartCoroutine(WaitForPatternToBeCompleted(bombsInPattern));
     }
@@ -169,22 +161,23 @@ public class BombSpawner : MonoBehaviour
 
         while (bombDifused != bombCount) 
         {
-            int bombTemp = 0;
+            int bombDefusedInPattern = 0;
+
             for (int i = 0; i < bombsInPattern.Count; i++) 
             {
                 if (bombsInPattern[i].bombDefused) 
                 {
-                    bombTemp += 1;
+                    bombDefusedInPattern += 1;
                 }
             }
 
-            bombDifused = bombTemp;
+            bombDifused = bombDefusedInPattern;
 
             yield return null;
         }
 
         Debug.Log("All bombs Defused");
-        patternIsOn = false;
+        waitingOnPatternClear = false;
 
         yield return null;
     }

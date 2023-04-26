@@ -5,16 +5,24 @@ using UnityEngine.Pool;
 
 public interface ISelectable
 {
-    Transform selectableTransform { get; }
-    Rigidbody2D selectableRigidbody { get; }
+    Transform SelectableTransform { get; }
+    Rigidbody2D SelectableRigidbody { get; }
     void OnSelect();
     void OnDiselect();
     bool IsSelectable { get; }
 }
 
+/// <summary>
+/// Any object that the player can interact with is an Actor. 
+/// 
+/// Example: 
+/// -Collectables
+/// -Pickable Objects
+/// 
+/// </summary>
 public class Actor : MonoBehaviour, ISelectable
 {
-    protected Coroutine bounceCouroutine;
+    protected Coroutine bounceCoroutine;
     bool bouncing = false;
 
     protected Rigidbody2D rb;
@@ -28,11 +36,12 @@ public class Actor : MonoBehaviour, ISelectable
     public bool isOnGround = true;
     [SerializeField] int maxBounces;
     public float bounceSpeeds;
+    [SerializeField] float pickUpScaleMultiplier = 1.5f;
 
     private IObjectPool<Actor> actorPool;
 
-    public Transform selectableTransform { get { return transform; } }
-    public Rigidbody2D selectableRigidbody { get { return rb; } }
+    public Transform SelectableTransform { get { return transform; } }
+    public Rigidbody2D SelectableRigidbody { get { return rb; } }
     public bool IsSelectable { get { return canBeSelected; } }
 
     public virtual void Awake()
@@ -59,7 +68,7 @@ public class Actor : MonoBehaviour, ISelectable
     public virtual void PickUpActor()
     {
         isOnGround = false;
-        transform.localScale = startScale * 1.5f;
+        transform.localScale = startScale * pickUpScaleMultiplier;
     }
 
     public virtual void OnDiselect()
@@ -70,27 +79,27 @@ public class Actor : MonoBehaviour, ISelectable
 
     public virtual void DropActor() 
     {
-        bounceCouroutine = StartCoroutine(BounceActor());
+        bounceCoroutine = StartCoroutine(BounceActor());
     }
 
     public void StopBounceActor() 
     {
-        if (bounceCouroutine != null)
+        if (bounceCoroutine != null)
         {
-            StopCoroutine(bounceCouroutine);
+            StopCoroutine(bounceCoroutine);
         }
 
         bouncing = false;
     }
 
-    public virtual IEnumerator BounceActor()
+    private IEnumerator BounceActor()
     {
         bouncing = true;
         float timeElapsed = 0;
 
         currentBounces = 0;
 
-        float bounceHeight = 1.5f;
+        float bounceHeight = pickUpScaleMultiplier;
         Vector3 fromScale = startScale * bounceHeight;
         Vector3 toScale = startScale;
 
@@ -137,12 +146,18 @@ public class Actor : MonoBehaviour, ISelectable
         actorCollider.enabled = newEnabled;
     }
 
+    //Assigns gameobject to a ObjectPool to be realesed when not used.
     public void SetPool(IObjectPool<Actor> pool)
     {
         actorPool = pool;
     }
 
-    public IEnumerator ReleaseToPoolAfterSeconds(float seconds) 
+    public void ReleaseToPoolAfterSeconds(float seconds) 
+    {
+        StartCoroutine(ReleaseToPoolAfterSecondsC(seconds));
+    }
+
+    private IEnumerator ReleaseToPoolAfterSecondsC(float seconds) 
     {
         yield return new WaitForSeconds(seconds);
 
@@ -166,7 +181,7 @@ public class Actor : MonoBehaviour, ISelectable
     public virtual void OnEnable() 
     {
         canBeSelected = true;
-        //When enabled, we runt he drop actor animation
+        //When enabled, we run the drop actor animation
         DropActor();
     }
 

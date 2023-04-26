@@ -10,7 +10,7 @@ public interface IGameInstance
     PlayerData PlayerDataSaved { get; }
     GameSettings GetGameSettings { get; }
 
-    void SetScore(int newScore);
+    void SetHighScore(int newScore);
     void SaveGameData();
 }
 
@@ -34,7 +34,7 @@ public class GameInstance : IGameInstance
         gameSettings = new GameSettings(true);
     }
 
-    public void SetScore(int newScore)
+    public void SetHighScore(int newScore)
     {
         if (newScore > playerDataSaved.highScore)
         {
@@ -42,8 +42,6 @@ public class GameInstance : IGameInstance
         }
     }
 
-    //For now, we just start a new game since this isn't really used. In future,
-    //we might wanna make it delete the saved file rather than starting a new game on top.
     public void EraseGame()
     {
         playerDataSaved = SaveSystem.StartNewGame();
