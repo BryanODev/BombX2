@@ -156,10 +156,10 @@ public class BombSpawner : MonoBehaviour
 
     IEnumerator WaitForPatternToBeCompleted(List<Bomb> bombsInPattern) 
     {
-        int bombCount = bombsInPattern.Count;
-        int bombDifused = 0;
+        int bombInPatternCount = bombsInPattern.Count;
+        int bombPatternDifused = 0;
 
-        while (bombDifused != bombCount) 
+        while (bombPatternDifused != bombInPatternCount) 
         {
             int bombDefusedInPattern = 0;
 
@@ -171,7 +171,7 @@ public class BombSpawner : MonoBehaviour
                 }
             }
 
-            bombDifused = bombDefusedInPattern;
+            bombPatternDifused = bombDefusedInPattern;
 
             yield return null;
         }

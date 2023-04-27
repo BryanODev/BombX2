@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
 
     [Inject] IGameModeState gameModeState;
 
+    public float itemDragSpeed = 10;
+    public Vector2 lastTouchPosition = Vector2.zero;
+    public Vector3 lastTouchPositionInWorld = Vector2.zero;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -28,49 +32,84 @@ public class PlayerController : MonoBehaviour
         SetUpPlayerInputs();
     }
 
-    public void SetUpPlayerInputs() 
+    public void SetUpPlayerInputs()
     {
+      
     }
 
     private void Update()
     {
+        HandlePlayerInput();
+    }
+
+    public void HandlePlayerInput()
+    {
         if (gameModeState.GameEnded || !gameModeState.GameStarted) { return; }
 
-        if (playerInput.MainControls.TouchPress.WasPressedThisFrame()) 
+        lastTouchPosition = playerInput.MainControls.TouchPosition.ReadValue<Vector2>();
+        lastTouchPositionInWorld = playerCamera.ScreenToWorldPoint(lastTouchPosition);
+        lastTouchPositionInWorld.z = 0;
+
+        if (playerInput.MainControls.TouchPress.WasPressedThisFrame())
         {
             Debug.Log("Player Pick Bomb");
 
-            Vector2 screenPosition = playerInput.MainControls.TouchPosition.ReadValue<Vector2>();
-            TrySelectingObject(screenPosition);
+            TrySelectingObject();
         }
 
-        if (playerInput.MainControls.TouchPress.IsInProgress()) 
+        if (holdingObject != null)
         {
-            Vector3 holdingObjectPos = playerCamera.ScreenToWorldPoint(playerInput.MainControls.TouchPosition.ReadValue<Vector2>());
-            holdingObjectPos.z = -5;
+            //if (!holdingObject.IsSelectable) 
+            //{
+            //    DeselectObject();
+            //}
 
-            if (holdingObject != null && holdingObject.IsSelectable)
+            DragObject();
+        }
+
+        if (playerInput.MainControls.TouchPress.WasReleasedThisFrame())
+        {
+            DeselectObject();
+        }
+    }
+
+    private void TrySelectingObject()
+    {
+        Collider2D collider = Physics2D.OverlapCircle(lastTouchPositionInWorld, 0.25f);
+
+        if (collider)
+        {
+            ISelectable selectable = collider.GetComponent<ISelectable>();
+
+            if (selectable != null && selectable.IsSelectable)
             {
-                holdingObject.SelectableRigidbody.velocity = (holdingObjectPos - holdingObject.SelectableTransform.position) * 10;
-                //holdingObject.selectableTransform.position = holdingObjectPos;
+                SelectObject(selectable);
             }
         }
+    }
 
-        if (playerInput.MainControls.TouchPress.WasReleasedThisFrame()) 
+    public void SelectObject(ISelectable selectableObject)
+    {
+        Debug.Log("Grab " + selectableObject.SelectableTransform.name);
+        holdingObject = selectableObject;
+        holdingObject.OnSelect();
+    }
+
+    void DragObject() 
+    {
+        if (holdingObject != null)
         {
-            Debug.Log("Player Drop Bomb");
-
-            Vector3 holdingObjectPos = playerCamera.ScreenToWorldPoint(playerInput.MainControls.TouchPosition.ReadValue<Vector2>());
-            holdingObjectPos.z = 0;
-
-            if (holdingObject != null && holdingObject.IsSelectable)
-            {
-                holdingObject.SelectableRigidbody.velocity = (holdingObjectPos - holdingObject.SelectableTransform.position) * 10;
-                //holdingObject.selectableTransform.position = holdingObjectPos;
-                holdingObject.OnDiselect();
-                holdingObject = null;
-            }
+            holdingObject.SelectableRigidbody.velocity = (lastTouchPositionInWorld - holdingObject.SelectableTransform.position) * itemDragSpeed;
+            //holdingObject.selectableTransform.position = holdingObjectPos;
         }
+    }
+
+    void DeselectObject() 
+    {
+        if(holdingObject == null) { return; }
+
+        holdingObject.OnDiselect();
+        holdingObject = null;
     }
 
     private void OnDisable()
@@ -78,27 +117,5 @@ public class PlayerController : MonoBehaviour
         playerInput.Disable();
     }
 
-    private void TrySelectingObject(Vector2 screenPosition)
-    {
-        Vector3 circlePos = playerCamera.ScreenToWorldPoint(screenPosition);
-        circlePos.z = 0;
 
-        Collider2D collider = Physics2D.OverlapCircle(circlePos, 0.25f);
-
-        if (collider) 
-        {
-            ISelectable selectable = collider.GetComponent<ISelectable>();
-
-            if (selectable != null && selectable.IsSelectable)
-            {
-                GrabObject(selectable);
-            }
-        }
-    }
-
-    public void GrabObject(ISelectable selectableObject) 
-    {
-        holdingObject = selectableObject;
-        holdingObject.OnSelect();
-    }
 }

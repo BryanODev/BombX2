@@ -113,12 +113,14 @@ public class Bomb : Actor
 
         //Make sure we stop bouce coroutine so it doesn't fight with the FallObject coroutine.
         StopCoroutine(bounceCoroutine);
+        StopAllCoroutines();
         fallObjectCoroutine = StartCoroutine(FallObject(1));
     }
 
     //Note: This function can be on Actor. For now we can leave it here, since we only have bombs as actors. But eventually, if we add more types of actors, this would be good in the Actor Class.
     private IEnumerator FallObject(float fallSpeed) 
     {
+        canBeSelected = false;
         float timeElapsed = 0;
         Vector3 ToScale = new Vector3(0.05f, 0.05f, 0.05f);
         Vector3 currentScale = transform.localScale;
@@ -131,6 +133,7 @@ public class Bomb : Actor
             yield return null;
         }
 
+        Debug.Log("DISABLE!");
         //For now, since Fall Object means the object went trought the canal, we release to pool, disabling the gameobject.
         ReleaseToPool();
 

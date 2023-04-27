@@ -5,6 +5,7 @@ using UnityEngine.Pool;
 
 public interface ISelectable
 {
+    GameObject SelectableGameObject { get; }
     Transform SelectableTransform { get; }
     Rigidbody2D SelectableRigidbody { get; }
     void OnSelect();
@@ -40,6 +41,7 @@ public class Actor : MonoBehaviour, ISelectable
 
     private IObjectPool<Actor> actorPool;
 
+    public GameObject SelectableGameObject { get { return gameObject; } }
     public Transform SelectableTransform { get { return transform; } }
     public Rigidbody2D SelectableRigidbody { get { return rb; } }
     public bool IsSelectable { get { return canBeSelected; } }
@@ -61,6 +63,8 @@ public class Actor : MonoBehaviour, ISelectable
     {
         if (!canBeSelected) { return; }
 
+        canBeSelected = false;
+
         StopBounceActor();
         PickUpActor();
     }
@@ -73,6 +77,7 @@ public class Actor : MonoBehaviour, ISelectable
 
     public virtual void OnDiselect()
     {
+        Debug.Log("Deselect!");
         DropActor();
         canBeSelected = true;
     }
@@ -86,10 +91,9 @@ public class Actor : MonoBehaviour, ISelectable
     {
         if (bounceCoroutine != null)
         {
+            bouncing = false;
             StopCoroutine(bounceCoroutine);
         }
-
-        bouncing = false;
     }
 
     private IEnumerator BounceActor()
@@ -117,10 +121,6 @@ public class Actor : MonoBehaviour, ISelectable
 
             isOnGround = transform.localScale == startScale;
 
-            if (isOnGround)
-            {
-                //Debug.Log("OnGround");
-            }
 
             bounceHeight -= 0.25f;
             bounceHeight = Mathf.Clamp(bounceHeight, 1, bounceHeight);

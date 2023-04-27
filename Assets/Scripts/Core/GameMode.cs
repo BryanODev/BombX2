@@ -173,7 +173,11 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
 
         audioManager.FadeMusicVolumen(0.5f, 0);
 
-        gameInstance.PlayerDataSaved.highScore = gameScore;
+        if (gameScore > gameInstance.PlayerDataSaved.highScore)
+        {
+            gameInstance.PlayerDataSaved.highScore = gameScore;
+        }
+
         gameInstance.SaveGameData();
     }
 
