@@ -4,12 +4,6 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;
 
-[System.Serializable]
-public class BombTeam
-{
-    public int bombTeamIndex;
-    public Color bombColor;
-}
 
 public class BombSpawner : MonoBehaviour
 {
@@ -24,7 +18,6 @@ public class BombSpawner : MonoBehaviour
     [Inject] IGameModeEvents gameModeEvents;
     [Inject] IGameModeState gameModeState;
 
-    [SerializeField] BombTeam[] bombTeams;
     [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
     [SerializeField] BombSpawnerLevelLibrary bombSpawnLevelLibrary;
 
@@ -33,6 +26,8 @@ public class BombSpawner : MonoBehaviour
     Coroutine bombSpawningCoroutine;
     Coroutine pattnerSpawnWaitTimeCoroutine;
     bool waitingOnPatternClear;
+
+    [SerializeField] ColorPallet colorPallet;
 
     private void Awake()
     {
@@ -97,14 +92,14 @@ public class BombSpawner : MonoBehaviour
     {
         //Debug.Log("Spawned bomb on pos: " + position);
         Bomb bomb = bombPool?.Get() as Bomb;
-        int randomTeam = Random.Range(0, bombTeams.Length);
+        int randomTeam = Random.Range(0, 2);
 
         if (bomb)
         {
             bomb.transform.SetPositionAndRotation(position, rotation);
 
-            bomb.SetBombID(bombTeams[randomTeam].bombTeamIndex);
-            bomb.SetBombColor(bombTeams[randomTeam].bombColor);
+            bomb.SetBombID(colorPallet.bombTeams[randomTeam].bombTeamIndex);
+            bomb.SetBombColor(colorPallet.bombTeams[randomTeam].bombColor);
 
             return bomb;
         }

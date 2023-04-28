@@ -76,19 +76,13 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
 
+    [SerializeField] ColorPallet colorPallet;
+
 
     public virtual void Awake()
     {
-        //if (Instance != null && Instance != this)
-        //{
-        //    Destroy(this);
-        //}
-        //else
-        //{
-        //    Instance = this;
-        //}
-
         currentState = GameState.Initializing;
+        colorPallet.Initialize();
     }
 
     public void Start()
@@ -120,10 +114,6 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     {
         Debug.Log("Initializing Game");
 
-        //Spawn Controller
-
-        //Find or Spawn a PlayerCamera & assign to follow the player character spawned
-
         //On Game Finish Initialization, Change to Starting Game
         currentState = GameState.WaitingToStart;
 
@@ -134,7 +124,6 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     {
  
     }
-
 
     public virtual void StartGame()
     {
@@ -162,14 +151,13 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
 
         Debug.Log("Game Ended!");
 
+        gameEnded = true;
         currentState = GameState.EndGame;
 
         if (onGameEnd != null)
         {
             onGameEnd();
         }
-
-        gameEnded = true;
 
         audioManager.FadeMusicVolumen(0.5f, 0);
 

@@ -45,10 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bombPrefab: {fileID: 8430252725012409835, guid: 51710fe2a3799eb4d9c23072d33d844b, type: 3}
-  bombs: []
   bombSpawnPatternLibrary: {fileID: 11400000, guid: 1ee55437c87ec6641a84d715d5bbba63, type: 2}
-  bombTeams:
-  - bombTeamIndex: 0
-    bombColor: {r: 0.99607843, g: 0, b: 0, a: 1}
-  - bombTeamIndex: 1
-    bombColor: {r: 0, g: 0.59607846, b: 0.9960785, a: 1}
+  bombSpawnLevelLibrary: {fileID: 11400000, guid: ab607cc6debffe049b2310e6ad66dc1d, type: 2}
+  colorPallet: {fileID: 11400000, guid: 199d8fffcad8225448b0b69f1a992c56, type: 2}

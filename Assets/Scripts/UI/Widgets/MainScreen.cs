@@ -10,7 +10,7 @@ public class MainScreen : Widget
 
     public void StartGame() 
     {
-        playerUI.OpenMenu<PlayerHUD>();
+        playerUI.OpenMenu<PlayerHUD>(true);
     }
 
     public void OpenSettingsScreen() 

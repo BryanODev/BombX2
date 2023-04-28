@@ -7,7 +7,7 @@ public interface IPlayerUI
     public ScoreCounter scoreCounter { get;}
     public ScreenTransition ScreenTransitionController { get; }
     public T GetMenu<T>() where T : Widget;
-    public void OpenMenu<W>() where W : Widget;
+    public void OpenMenu<W>(bool forceClose = false) where W : Widget;
 }
 
 public class PlayerUI : MonoBehaviour, IPlayerUI
@@ -54,7 +54,7 @@ public class PlayerUI : MonoBehaviour, IPlayerUI
         return null;
     }
 
-    public void OpenMenu<W>() where W : Widget
+    public void OpenMenu<W>(bool forceClose = false) where W : Widget
     {
         W uiMenu = GetMenu<W>();
 
@@ -65,7 +65,18 @@ public class PlayerUI : MonoBehaviour, IPlayerUI
             {
                 _menuHistory.Push(currentMenu);
 
-                currentMenu.CloseMenu();
+                if (currentMenu.isPersistent)
+                {
+                    if (forceClose)
+                    {
+                        currentMenu.CloseMenu();
+                    }
+                }
+                else
+                {
+                    currentMenu.CloseMenu();
+                }
+
             }
 
             currentMenu = uiMenu;

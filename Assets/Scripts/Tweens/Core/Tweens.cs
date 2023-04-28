@@ -10,9 +10,64 @@ namespace UI.Tweens
     {
         public IEnumerator Execute();
     }
+
     public interface ITweenOwnerListener
     {
         void OnTweenFinish(ITweenEffect tween);
+    }
+
+    public class TweenFloat : ITweenEffect 
+    {
+        float _floatValue;
+        float _fromFloating;
+        float _toFloating;
+        float _duration;
+        float _delay;
+        AnimationCurve _curve;
+        ITweenOwnerListener _ownerListener;
+
+        public TweenFloat(ref float floatValue, float fromFloating, float toFloating, float duration, AnimationCurve animationCurve, float delay = 0)
+        {
+            _floatValue = floatValue;
+            _fromFloating = fromFloating;
+            _toFloating = toFloating;
+            _duration = duration;
+            _delay = delay;
+            _curve = animationCurve;
+        }
+
+        public TweenFloat(ref float floatValue, float fromFloating, float toFloating, float duration, AnimationCurve animationCurve, ITweenOwnerListener listener, float delay = 0)
+        {
+            _floatValue = floatValue;
+            _fromFloating = fromFloating;
+            _toFloating = toFloating;
+            _duration = duration;
+            _delay = delay;
+            _curve = animationCurve;
+            _ownerListener = listener;
+        }
+
+        public IEnumerator Execute()
+        {
+            if (_delay > 0) 
+            {
+                yield return new WaitForSeconds(_delay);
+            }
+
+            float timeElapsed = 0;
+
+            while (_floatValue != _toFloating) 
+            {
+                _floatValue = Mathf.Lerp(_fromFloating, _toFloating, timeElapsed / _duration);
+                timeElapsed += Time.deltaTime;
+
+                yield return null;
+            }
+
+            _ownerListener?.OnTweenFinish(this);
+            
+            yield return null;
+        }
     }
 
     public class TweenScaler : ITweenEffect
@@ -224,7 +279,7 @@ namespace UI.Tweens
                 yield return new WaitForSeconds(_delay);
             }
 
-            float alphaDelta = _fromAlpha;
+            float alphaDelta = _image.color.a;
             float timeElapse = 0;
             Color currentColor = _image.color;
 
@@ -251,6 +306,61 @@ namespace UI.Tweens
             {
                 _callBack();
             }
+
+            yield return null;
+        }
+    }
+
+    public class TweenCanvasGroupAlpha : ITweenEffect
+    {
+        CanvasGroup _canvasGroup;
+        float _fromAlpha;
+        float _toAlpha;
+        float _duration;
+        float _delay;
+        AnimationCurve _curve;
+        ITweenOwnerListener _ownerListener;
+
+        public TweenCanvasGroupAlpha(CanvasGroup canvasGroup, float fromAlpha, float toAlpha, float duration, AnimationCurve animationCurve, float delay = 0)
+        {
+            _canvasGroup = canvasGroup;
+            _fromAlpha = fromAlpha;
+            _toAlpha = toAlpha;
+            _duration = duration;
+            _delay = delay;
+            _curve = animationCurve;
+        }
+
+        public TweenCanvasGroupAlpha(CanvasGroup canvasGroup, float fromAlpha, float toAlpha, float duration, AnimationCurve animationCurve, ITweenOwnerListener listener, float delay = 0)
+        {
+            _canvasGroup = canvasGroup;
+            _fromAlpha = fromAlpha;
+            _toAlpha = toAlpha;
+            _duration = duration;
+            _delay = delay;
+            _curve = animationCurve;
+            _ownerListener = listener;
+        }
+
+        public IEnumerator Execute()
+        {
+            if (_delay > 0)
+            {
+                yield return new WaitForSeconds(_delay);
+            }
+
+            float canvasGroupAlpha = _canvasGroup.alpha;
+            float timeElapsed = 0;
+
+            while (_canvasGroup.alpha != _toAlpha)
+            {
+                _canvasGroup.alpha = Mathf.Lerp(canvasGroupAlpha, _toAlpha, timeElapsed / _duration);
+                timeElapsed += Time.deltaTime;
+
+                yield return null;
+            }
+
+            _ownerListener?.OnTweenFinish(this);
 
             yield return null;
         }

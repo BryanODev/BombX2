@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 
+using UnityEngine.SceneManagement;
+
 public class PlayerController : MonoBehaviour
 {
     PlayerInputs playerInput;
@@ -40,6 +42,12 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandlePlayerInput();
+
+        if (Input.GetKeyDown(KeyCode.Space)) 
+        {
+            SceneManager.LoadScene(1);
+        }
+
     }
 
     public void HandlePlayerInput()

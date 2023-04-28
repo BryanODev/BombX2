@@ -326,7 +326,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 198180038}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 5}
   m_LocalScale: {x: 14.458165, y: 14.458165, z: 14.458165}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1419,10 +1419,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1024112901232985046, guid: a2f7e41f48a280545984fd42ce815a71, type: 3}
-      propertyPath: bombSpawnLevelLibrary
-      value: 
-      objectReference: {fileID: 11400000, guid: ab607cc6debffe049b2310e6ad66dc1d, type: 2}
     - target: {fileID: 1024112901232985047, guid: a2f7e41f48a280545984fd42ce815a71, type: 3}
       propertyPath: m_Name
       value: BombSpawner
@@ -1509,18 +1505,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 0.09653334
       objectReference: {fileID: 0}
-    - target: {fileID: 5498435034382803062, guid: 5d621bbbf8e428b4dad93cca3c334dcf, type: 3}
-      propertyPath: m_Size.x
-      value: 0.7067687
-      objectReference: {fileID: 0}
-    - target: {fileID: 5498435034382803062, guid: 5d621bbbf8e428b4dad93cca3c334dcf, type: 3}
-      propertyPath: m_Size.y
-      value: 0.6790875
-      objectReference: {fileID: 0}
-    - target: {fileID: 5498435034382803062, guid: 5d621bbbf8e428b4dad93cca3c334dcf, type: 3}
-      propertyPath: m_Offset.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5498435034382803337, guid: 5d621bbbf8e428b4dad93cca3c334dcf, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1584,6 +1568,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPersistent: 0
+  menuTranslationAnimCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  menuTranslationDuration: 0.5
 --- !u!114 &6085188610233897340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1596,7 +1605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d10167770bc65e141833914dbcb51f9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPersistent: 0
+  isPersistent: 1
 --- !u!1 &6280426030476802796
 GameObject:
   m_ObjectHideFlags: 0
@@ -2544,6 +2553,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPersistent: 0
+  backgroundImage: {fileID: 8544455446621885428}
+  settingScreenBackgroundFadeAnimCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!224 &8544455445877970885
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2577,6 +2611,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8544455445877970885}
   - component: {fileID: 8544455445877970884}
+  - component: {fileID: 8544455445877970887}
   m_Layer: 5
   m_Name: SettingsScreen
   m_TagString: Untagged
@@ -2584,6 +2619,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!225 &8544455445877970887
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8544455445877970886}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!222 &8544455445916567816
 CanvasRenderer:
   m_ObjectHideFlags: 0

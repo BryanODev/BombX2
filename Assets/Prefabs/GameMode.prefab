@@ -92,3 +92,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   playerControllerPrefab: {fileID: 0}
+  colorPallet: {fileID: 11400000, guid: 199d8fffcad8225448b0b69f1a992c56, type: 2}

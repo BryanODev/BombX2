@@ -151,6 +151,7 @@ public class Bomb : Actor
         //We 0 velocity to prevent the bomb explosion to slide over the level.
         rb.velocity = Vector3.zero;
 
+        StopAllCoroutines();
         audioManager?.PlayOneShotSound(bombExplosionSFX);
         StartCoroutine(GameplayUtilities.DoCameraShake(0.2f, .2f, 0));
 

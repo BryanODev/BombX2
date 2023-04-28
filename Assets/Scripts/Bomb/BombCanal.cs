@@ -14,6 +14,17 @@ public class BombCanal : MonoBehaviour, IBombTrigger
 {
     public int bombID;
 
+    [SerializeField] ColorPallet colorPallet;
+    [SerializeField] SpriteRenderer[] cornersSpriteRenderers;
+
+    void Start() 
+    {
+        for (int i = 0; i < cornersSpriteRenderers.Length; i++) 
+        {
+            cornersSpriteRenderers[i].color = colorPallet.bombTeams[bombID].bombColor;
+        }
+    }
+
     public void OnTriggerEnter2D(Collider2D collision)
     {
         

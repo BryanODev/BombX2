@@ -363,14 +363,15 @@ MonoBehaviour:
   isOnGround: 1
   maxBounces: 2
   bounceSpeeds: 8
-  bombExplosionSprite: {fileID: 3352905483705664215}
+  pickUpScaleMultiplier: 1.5
   bombSprite: {fileID: 6653687559286014341}
+  bombExplosionSprite: {fileID: 3352905483705664215}
   autoStartTimer: 1
   bombID: 0
   bombDefused: 0
   bombTimer: 8
   defusedColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-  bombAmplitude: 0.25
+  bombDenotateAmplitude: 0.25
   bombDenotateSpeed: 2
   bombDenotateSpeedMultiplier: 4
   bombDenotateScaleStart: 1
