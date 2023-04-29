@@ -76,7 +76,7 @@ public class GameMode : MonoBehaviour, IGameModeState, IGameModeEvents, IGameMod
     public OnGameStart OnGameStartDelegate { get { return onGameStart; } set { onGameStart += value; } }
     public OnGameEnd onGameEndDelegate { get { return onGameEnd; } set { onGameEnd += value; } }
 
-    [SerializeField] ColorPallet colorPallet;
+    [SerializeField] ColorPalletSystem colorPallet;
 
 
     public virtual void Awake()

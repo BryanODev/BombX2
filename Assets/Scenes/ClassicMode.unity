@@ -1655,7 +1655,7 @@ MonoBehaviour:
   m_text: 'SCORE:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 7e685686e9198d64fa6be9e92bccf986, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2554,6 +2554,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPersistent: 0
   backgroundImage: {fileID: 8544455446621885428}
+  buttonGrid: {fileID: 8544455446929561399}
+  buttonTranslationStart: {x: -850, y: 0}
+  buttonTranslationEnd: {x: 850, y: 0}
   settingScreenBackgroundFadeAnimCurve:
     serializedVersion: 2
     m_Curve:
@@ -2578,6 +2581,31 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  buttonTranslationAnimCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  animationDuration: 0.25
 --- !u!224 &8544455445877970885
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2611,7 +2639,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8544455445877970885}
   - component: {fileID: 8544455445877970884}
-  - component: {fileID: 8544455445877970887}
   m_Layer: 5
   m_Name: SettingsScreen
   m_TagString: Untagged
@@ -2619,18 +2646,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!225 &8544455445877970887
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8544455445877970886}
-  m_Enabled: 1
-  m_Alpha: 0
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!222 &8544455445916567816
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3333,7 +3348,7 @@ MonoBehaviour:
   m_text: 500
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 7e685686e9198d64fa6be9e92bccf986, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

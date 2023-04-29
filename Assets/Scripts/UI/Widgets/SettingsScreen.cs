@@ -10,21 +10,29 @@ public class SettingsScreen : Widget, MuteButtonListener, ITweenOwnerListener
 {
     [Inject] IAudioManager audioManager;
 
-    [SerializeField] Image backgroundImage;
     ITweenEffect settingScreenBackgroundFadeIn;
     ITweenEffect settingScreenBackgroundFadeOut;
-    [SerializeField] AnimationCurve settingScreenBackgroundFadeAnimCurve;
+    ITweenEffect buttonTranslateIn;
+    ITweenEffect buttonTranslateOut;
+    [SerializeField] Image backgroundImage;
+    [SerializeField] RectTransform buttonGrid;
 
-    CanvasGroup canvasGroup;
-    float alpha;
+    [SerializeField] Vector2 buttonTranslationStart;
+    [SerializeField] Vector2 buttonTranslationEnd;
+
+    [SerializeField] AnimationCurve settingScreenBackgroundFadeAnimCurve;
+    [SerializeField] AnimationCurve buttonTranslationAnimCurve;
+    [SerializeField] float animationDuration = 0.5f;
+
+    bool isClosing = false;
 
     void Awake()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0;
+        settingScreenBackgroundFadeIn = new TweenImageAlpha(backgroundImage, 0, 0.8f, animationDuration, settingScreenBackgroundFadeAnimCurve, this);
+        settingScreenBackgroundFadeOut = new TweenImageAlpha(backgroundImage, 0.8f, 0, animationDuration, settingScreenBackgroundFadeAnimCurve, this);
 
-        settingScreenBackgroundFadeIn = new TweenCanvasGroupAlpha(canvasGroup, 0, 1.0f, 0.5f, settingScreenBackgroundFadeAnimCurve, this);
-        settingScreenBackgroundFadeOut = new TweenCanvasGroupAlpha(canvasGroup, 1.0f, 0, 0.5f, settingScreenBackgroundFadeAnimCurve, this);
+        buttonTranslateIn = new TweenTranslate(buttonGrid, buttonTranslationStart, Vector2.zero, animationDuration, buttonTranslationAnimCurve, this);
+        buttonTranslateOut = new TweenTranslate(buttonGrid, Vector2.zero, buttonTranslationEnd, animationDuration, buttonTranslationAnimCurve, this);
     }
 
     public override void OpenMenu()
@@ -33,12 +41,27 @@ public class SettingsScreen : Widget, MuteButtonListener, ITweenOwnerListener
 
         StopAllCoroutines();
         StartCoroutine(settingScreenBackgroundFadeIn.Execute());
+        ButtonTranslateIn();
+    }
+
+    void ButtonTranslateIn()
+    {
+        StartCoroutine(buttonTranslateIn.Execute());
+    }
+
+    void ButtonTranslateOut()
+    {
+        StartCoroutine(buttonTranslateOut.Execute());
     }
 
     public void CloseOptionScreen() 
     {
+        if (isClosing) { return; }
+
         StopAllCoroutines();
         StartCoroutine(settingScreenBackgroundFadeOut.Execute());
+        ButtonTranslateOut();
+        isClosing = true;
     }
 
     public void OnMuteButtonClicked(MuteButtonType button)
@@ -66,9 +89,11 @@ public class SettingsScreen : Widget, MuteButtonListener, ITweenOwnerListener
 
     public void OnTweenFinish(ITweenEffect tween)
     {
-        if(settingScreenBackgroundFadeOut == tween)
+        if (settingScreenBackgroundFadeOut == tween)
         {
             playerUI.OpenMenu<MainScreen>();
+            isClosing = false;
         }
     }
+
 }

@@ -10,7 +10,7 @@ public class BombTeam
 }
 
 [CreateAssetMenu(fileName = "New ColorPalletSystem", menuName = "GameVisuals/ColorPalletSystem", order = 0)]
-public class ColorPallet : ScriptableObject
+public class ColorPalletSystem : ScriptableObject
 {
     public List<BombTeam> bombTeams;
 
@@ -40,10 +40,24 @@ public class ColorPallet : ScriptableObject
         bombTeams[0].bombColor = randomColor;
         bombTeams[0].bombColor.a = 1;
 
-        float triadicHue = (hue + 0.667f) % 1;
+        float triadicHue1 = (hue + 0.333f) % 1;
+        float triadicHue2 = (hue + 0.667f) % 1;
+
+        int randomTriadic = Random.Range(0, 2);
+
+        Debug.Log(randomTriadic);
 
         bombTeams[1].bombTeamIndex = 1;
-        bombTeams[1].bombColor = Color.HSVToRGB(triadicHue, .75f, 1f);
+
+        if (randomTriadic == 0)
+        {
+            bombTeams[1].bombColor = Color.HSVToRGB(triadicHue1, .75f, 1f);
+        }
+        else if (randomTriadic == 1) 
+        {
+            bombTeams[1].bombColor = Color.HSVToRGB(triadicHue2, .75f, 1f);
+        }
+
         bombTeams[1].bombColor.a = 1;
     }
 }

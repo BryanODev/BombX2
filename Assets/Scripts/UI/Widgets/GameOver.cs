@@ -15,7 +15,7 @@ public class GameOver : Widget
 
     private void Awake()
     {
-        menuTranslationIn = new TweenTranslate(GetComponent<RectTransform>(), new Vector2(0, 975), Vector2.zero, menuTranslationDuration, menuTranslationAnimCurve);
+        menuTranslationIn = new TweenTranslate(GetComponent<RectTransform>(), new Vector2(0, -975), Vector2.zero, menuTranslationDuration, menuTranslationAnimCurve);
     }
 
     public override void OpenMenu()

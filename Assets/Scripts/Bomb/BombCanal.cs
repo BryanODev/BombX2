@@ -14,7 +14,7 @@ public class BombCanal : MonoBehaviour, IBombTrigger
 {
     public int bombID;
 
-    [SerializeField] ColorPallet colorPallet;
+    [SerializeField] ColorPalletSystem colorPallet;
     [SerializeField] SpriteRenderer[] cornersSpriteRenderers;
 
     void Start() 

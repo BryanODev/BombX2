@@ -27,7 +27,7 @@ public class BombSpawner : MonoBehaviour
     Coroutine pattnerSpawnWaitTimeCoroutine;
     bool waitingOnPatternClear;
 
-    [SerializeField] ColorPallet colorPallet;
+    [SerializeField] ColorPalletSystem colorPallet;
 
     private void Awake()
     {
