@@ -17,7 +17,9 @@ public class BombSpawner : MonoBehaviour
     [Inject] IGameModeScore gameModeScore;
     [Inject] IGameModeEvents gameModeEvents;
     [Inject] IGameModeState gameModeState;
+    [Inject] IGameInstance gameInstance;
 
+    [SerializeField] BombSkinsLibrary bombSkinsLibrary;
     [SerializeField] BombSpawnPatternLibrary bombSpawnPatternLibrary;
     [SerializeField] BombSpawnerLevelLibrary bombSpawnLevelLibrary;
 
@@ -248,6 +250,13 @@ public class BombSpawner : MonoBehaviour
 
     private void OnGetBomb(Actor bomb)
     {
+        //Spawn bomb with player's settings
+        //Load skins and assign here
+
+        Bomb bombRef = bomb.GetComponent<Bomb>();
+        bombRef.BombSpriteRenderer.sprite = bombSkinsLibrary.GetBombSkinByName(gameInstance.PlayerDataSaved.currentBombSkinName).bombSprite;
+        bombRef.BombSpriteRenderer.material = bombSkinsLibrary.GetBombSkinByName(gameInstance.PlayerDataSaved.currentBombSkinName).bombMaterial;
+
         bomb.transform.position = transform.position;
         bomb.gameObject.SetActive(true);
     }

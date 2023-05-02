@@ -1419,6 +1419,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1024112901232985046, guid: a2f7e41f48a280545984fd42ce815a71, type: 3}
+      propertyPath: bombSkinsLibrary
+      value: 
+      objectReference: {fileID: 11400000, guid: 4ce4cce853cdc8c469e7c6588c0baca9, type: 2}
     - target: {fileID: 1024112901232985047, guid: a2f7e41f48a280545984fd42ce815a71, type: 3}
       propertyPath: m_Name
       value: BombSpawner

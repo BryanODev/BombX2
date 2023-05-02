@@ -26,7 +26,6 @@ public class GameInstance : IGameInstance
     private PlayerData playerDataSaved;
     public PlayerData PlayerDataSaved { get { return playerDataSaved; } }
 
-
     public GameInstance()
     {
         LoadSaveData();

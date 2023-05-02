@@ -11,7 +11,7 @@ public static class SaveSystem
 
     public static PlayerData StartNewGame()
     {
-        PlayerData newData = new PlayerData(0, true);
+        PlayerData newData = new PlayerData(0, "DefaultBomb", true);
         return newData;
     }
 

@@ -11,6 +11,8 @@ public class Bomb : Actor
     [SerializeField] Transform bombSprite;
     [SerializeField] Transform bombExplosionSprite;
 
+    public SpriteRenderer BombSpriteRenderer { get { return bombSpriteRenderer; } set { bombSpriteRenderer = value; } }
+
     Collider2D bombCollider;
 
     [Header("Bomb Gameplay Settings")]
@@ -40,15 +42,11 @@ public class Bomb : Actor
     IAudioManager audioManager;
     public AudioClip bombExplosionSFX;
 
-    Material bombMaterialInstance;
-
     public override void Awake()
     {
         base.Awake();
 
         bombSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        
-        bombMaterialInstance = bombSpriteRenderer.material;
         bombCollider = GetComponent<Collider2D>();
 
         currentBombTimer = bombTimer;
@@ -225,7 +223,7 @@ public class Bomb : Actor
     //Not to be confused with SpriteRendere color. The bomb color uses materials properties, SpriteRenderer is on top.
     public void SetBombColor(Color bombColor) 
     {
-        bombMaterialInstance.SetColor("_BombColor", bombColor);
+        BombSpriteRenderer.material.SetColor("_BombColor", bombColor);
     }
 
     public override void ResetTransformScale()
