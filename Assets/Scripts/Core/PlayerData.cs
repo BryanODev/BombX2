@@ -15,5 +15,8 @@ public class PlayerData
         highScore = _coinsCollected;
         currentBombSkinName = _currentBombSkinName;
         firstTimePlaying = _firstTimePlaying;
+
+        bombSkinsUnlocked = new List<string>();
+        bombSkinsUnlocked.Add("DefaultBomb");
     }
 }

@@ -5,6 +5,11 @@ using Zenject;
 
 public delegate void OnMeatAmmountChange(int newAmmount);
 
+public interface IPlayerData
+{
+    PlayerData PlayerDataSaved { get; }
+} 
+
 public interface IGameInstance
 {
     PlayerData PlayerDataSaved { get; }
@@ -14,7 +19,7 @@ public interface IGameInstance
     void SaveGameData();
 }
 
-public class GameInstance : IGameInstance
+public class GameInstance : IGameInstance, IPlayerData
 {
 
     DiContainer container;

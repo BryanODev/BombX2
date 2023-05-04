@@ -243,6 +243,13 @@ public class BombSpawner : MonoBehaviour
         Bomb bomb = container.InstantiatePrefab(bombPrefab, transform.position, Quaternion.identity, null).GetComponent<Bomb>();
         bomb.SetPool(bombPool);
 
+        BombSkin currentSkin = bombSkinsLibrary.GetBombSkinByName(gameInstance.PlayerDataSaved.currentBombSkinName);
+
+        bomb.SetBombFireSparkPosition(currentSkin.bombSparklePosition);
+        bomb.BombSpriteRenderer.sprite = currentSkin.bombSprite;
+        bomb.BombSpriteRenderer.material = currentSkin.bombMaterial;
+
+
         bombs.Add(bomb);
 
         return bomb;
@@ -252,10 +259,6 @@ public class BombSpawner : MonoBehaviour
     {
         //Spawn bomb with player's settings
         //Load skins and assign here
-
-        Bomb bombRef = bomb.GetComponent<Bomb>();
-        bombRef.BombSpriteRenderer.sprite = bombSkinsLibrary.GetBombSkinByName(gameInstance.PlayerDataSaved.currentBombSkinName).bombSprite;
-        bombRef.BombSpriteRenderer.material = bombSkinsLibrary.GetBombSkinByName(gameInstance.PlayerDataSaved.currentBombSkinName).bombMaterial;
 
         bomb.transform.position = transform.position;
         bomb.gameObject.SetActive(true);

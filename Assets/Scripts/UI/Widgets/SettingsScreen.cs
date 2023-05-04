@@ -35,6 +35,13 @@ public class SettingsScreen : Widget, MuteButtonListener, ITweenOwnerListener
         buttonTranslateOut = new TweenTranslate(buttonGrid, Vector2.zero, buttonTranslationEnd, animationDuration, buttonTranslationAnimCurve, this);
     }
 
+    void OnEnable()
+    {
+        Color color = backgroundImage.color;
+        color.a = 0;
+        backgroundImage.color = color;
+    }
+
     public override void OpenMenu()
     {
         base.OpenMenu();

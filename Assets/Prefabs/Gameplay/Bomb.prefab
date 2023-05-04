@@ -364,6 +364,7 @@ MonoBehaviour:
   maxBounces: 2
   bounceSpeeds: 8
   pickUpScaleMultiplier: 1.5
+  bombSparkleTransform: {fileID: 3151395304664174451}
   bombSprite: {fileID: 6653687559286014341}
   bombExplosionSprite: {fileID: 3352905483705664215}
   autoStartTimer: 1

@@ -8,6 +8,7 @@ public class Bomb : Actor
 {
     [Header("Bomb Sprite")]
     SpriteRenderer bombSpriteRenderer;
+    [SerializeField] Transform bombSparkleTransform;
     [SerializeField] Transform bombSprite;
     [SerializeField] Transform bombExplosionSprite;
 
@@ -244,5 +245,11 @@ public class Bomb : Actor
 
         //Reset color to white/default
         SetSpriteRendererColor(Color.white);
+    }
+
+    public void SetBombFireSparkPosition(Vector2 newPos) 
+    {
+        Vector3 pos = new Vector3(newPos.x, newPos.y, bombSparkleTransform.position.z);
+        bombSparkleTransform.localPosition = pos;
     }
 }

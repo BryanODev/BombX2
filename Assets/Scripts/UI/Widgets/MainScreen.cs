@@ -17,4 +17,9 @@ public class MainScreen : Widget
     {
         playerUI.OpenMenu<SettingsScreen>();
     }
+
+    public void OpenSkinSelect() 
+    {
+        playerUI.OpenMenu<SkinSelection>();
+    }
 }
