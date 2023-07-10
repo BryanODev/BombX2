@@ -42,7 +42,7 @@ MonoBehaviour:
     singleBombExplodeTime: 5
     patternBombExplodeTime: 6
   - minimunScore: 45
-    maximunScore: 999999
+    maximunScore: Infinity
     singleBombProbability: 0.65
     timeBetweenBombs: 0.75
     patternLevel: 5

@@ -18,33 +18,18 @@ public class SkinSelectButton : MonoBehaviour
     private Button skinSelectButton;
     private bool isUnlocked;
 
-    private void OnEnable()
+    SkinSelection screenSelection;
+
+    private void Awake()
     {
+        screenSelection = GetComponentInParent<SkinSelection>();
         skinSelectButton = GetComponent<Button>();
         buttonImage = GetComponent<Image>();
-
-        foreach (string bombName in gameInstance.PlayerDataSaved.bombSkinsUnlocked) 
-        {
-            if (bombSkinName.Equals(bombName)) 
-            {
-                isUnlocked = true;
-                skinPrice.gameObject.SetActive(false);
-            }
-        }
-
-        if (gameInstance.PlayerDataSaved.currentBombSkinName.Equals(bombSkinName)) 
-        {
-            buttonImage.sprite = selectedSprite;
-        }
-        else 
-        {
-            buttonImage.sprite = unselectedSprite;
-        }
     }
 
-    public void OnSkinSelect() 
+    public void SetIsUnlocked(bool newIsUnlocked) 
     {
-        gameInstance.PlayerDataSaved.currentBombSkinName = bombSkinName;
+        isUnlocked = newIsUnlocked;
     }
 
 }

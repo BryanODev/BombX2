@@ -227,6 +227,12 @@ public class Bomb : Actor
         BombSpriteRenderer.material.SetColor("_BombColor", bombColor);
     }
 
+    public void SetBombTimer(float newBombTime) 
+    {
+        bombTimer = newBombTime;
+        ResetTimer();
+    }
+
     public override void ResetTransformScale()
     {
         base.ResetTransformScale();

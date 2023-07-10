@@ -19,10 +19,14 @@ public class SkinSelection : Widget, ITweenOwnerListener
 
     bool isClosing = false;
 
+    SkinSelectButton[] skinsButtons;
+
     void Awake()
     {
         skinSelectionTranslateIn = new TweenTranslate(GetComponent<RectTransform>(), buttonTranslationStart, Vector2.zero, animationDuration, buttonTranslationAnimCurve, this);
         skinSelectionTranslateOut = new TweenTranslate(GetComponent<RectTransform>(), Vector2.zero, buttonTranslationEnd, animationDuration, buttonTranslationAnimCurve, this);
+
+        skinsButtons = GetComponentsInChildren<SkinSelectButton>();
     }
 
     public override void OpenMenu()

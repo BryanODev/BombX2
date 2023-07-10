@@ -28,6 +28,7 @@ public class BombSpawner : MonoBehaviour
     Coroutine bombSpawningCoroutine;
     Coroutine pattnerSpawnWaitTimeCoroutine;
     bool waitingOnPatternClear;
+    bool wasWaitingOnPattern;
 
     [SerializeField] ColorPalletSystem colorPallet;
 
@@ -65,21 +66,25 @@ public class BombSpawner : MonoBehaviour
         {
             if (!waitingOnPatternClear)
             {
-                SpawnerLevel currentLevel = bombSpawnLevelLibrary.GetCurrentLevelByScore(gameModeScore.GameScore);
+                //If we were waiting on pattern, we wait a couple of seconds before spawning bombs again. So its not instantly spawn, and it keeps a consistent flow.
+                if (wasWaitingOnPattern)
+                {
+                    wasWaitingOnPattern = false;
+                    yield return new WaitForSeconds(GetCurrentLevel().timeBetweenBombs);
+                }
 
                 float singleBombOrPattern = Random.value;
 
-                if (singleBombOrPattern < currentLevel.singleBombProbability)
+                if (singleBombOrPattern < GetCurrentLevel().singleBombProbability)
                 {
-                    Bomb bomb = SpawnBombInArea();
-                    bomb.bombTimer = currentLevel.singleBombExplodeTime;
+                    SpawnBomb(RandomPositionInArea(2f, 2f), Quaternion.identity).SetBombTimer(GetCurrentLevel().singleBombExplodeTime); //Spawn bomb in a random position inside the area and set the timer.
                 }
                 else
                 {
-                    SpawnRandomPatternByDifficulty(currentLevel.patternLevel, currentLevel);
+                    SpawnRandomPatternByDifficulty(GetCurrentLevel().patternLevel, GetCurrentLevel());
                 }
 
-                yield return new WaitForSeconds(currentLevel.timeBetweenBombs);
+                yield return new WaitForSeconds(GetCurrentLevel().timeBetweenBombs);
             }
 
             //Debug.Log("Waiting on Pattern");
@@ -109,11 +114,6 @@ public class BombSpawner : MonoBehaviour
         return null;
     }
 
-    Bomb SpawnBombInArea()
-    {
-       return SpawnBomb(RandomPositionInArea(2f, 2f), Quaternion.identity);
-    }
-
     public void SpawnPattern(string patternTag) 
     {
         lastPatternUsed = bombSpawnPatternLibrary.GetPatternByTag(patternTag);
@@ -122,7 +122,7 @@ public class BombSpawner : MonoBehaviour
         {
             foreach (Vector2 point in lastPatternUsed.spawnPoints)
             {
-                SpawnBomb(point, Quaternion.identity);
+                SpawnBomb(point, Quaternion.identity).SetBombTimer(GetCurrentLevel().patternBombExplodeTime);
             }
         }
     }
@@ -147,6 +147,7 @@ public class BombSpawner : MonoBehaviour
         }
 
         waitingOnPatternClear = true;
+        wasWaitingOnPattern = true;
 
         pattnerSpawnWaitTimeCoroutine = StartCoroutine(WaitForPatternToBeCompleted(bombsInPattern));
     }
@@ -284,5 +285,10 @@ public class BombSpawner : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(3, 3, 1));
+    }
+
+    public SpawnerLevel GetCurrentLevel() 
+    {
+        return bombSpawnLevelLibrary.GetCurrentLevelByScore(gameModeScore.GameScore);
     }
 }
